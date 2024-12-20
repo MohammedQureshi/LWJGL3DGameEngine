@@ -2,13 +2,6 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'java'
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
-
-jar {
-    manifest {
-        attributes 'Main-Class': 'org.example.Main'
-    }
 }
 
 group = 'org.example'
@@ -126,10 +119,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-shadowJar {
-    archiveBaseName.set('MyGame')
-    archiveVersion.set('1.0')
-    archiveClassifier.set('')
 }
