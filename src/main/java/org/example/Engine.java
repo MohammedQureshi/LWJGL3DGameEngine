@@ -20,7 +20,7 @@ public class Engine {
         targetUps = options.ups;
         this.gameLogic = gameLogic;
         render = new Render();
-        scene = new Scene();
+        scene = new Scene(window.getWidth(), window.getHeight());
         gameLogic.init(window, scene, render);
         running = true;
     }
@@ -80,7 +80,7 @@ public class Engine {
     }
 
     private void resize() {
-
+        scene.resize(window.getWidth(), window.getHeight());
     }
 
 }
