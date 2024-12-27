@@ -37,6 +37,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
+    implementation group: 'org.joml', name: 'joml', version: '1.10.8'
+    implementation group: 'com.esotericsoftware', name: 'kryonet', version: '2.22.0-RC1'
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
     implementation "org.lwjgl:lwjgl-bgfx"
@@ -119,4 +121,22 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.register('createApp', Exec) {
+    dependsOn jar
+    commandLine 'jpackage', '--input', 'build/libs',
+            '--name', 'LWJGL3DGameEngine-1.0-SNAPSHOT',
+            '--main-jar', 'LWJGL3DGameEngine-1.0-SNAPSHOT.jar',
+            '--main-class', 'org.example.Main',
+            '--type', 'app-image'
+}
+
+tasks.register('createExe', Exec) {
+    dependsOn jar
+    commandLine 'jpackage', '--input', 'build/libs',
+            '--name', 'LWJGL3DGameEngine-1.0-SNAPSHOT',
+            '--main-jar', 'LWJGL3DGameEngine-1.0-SNAPSHOT.jar',
+            '--main-class', 'org.example.Main',
+            '--type', 'exe'
 }
