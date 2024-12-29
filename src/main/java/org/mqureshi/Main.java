@@ -180,18 +180,19 @@ public class Main implements GameLogicInterface {
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
             camera.moveRight(move);
         }
-        if (window.isKeyPressed(GLFW_KEY_UP)) {
+        if (window.isKeyPressed(GLFW_KEY_SPACE)) {
             camera.moveUp(move);
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+        } else if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
             camera.moveDown(move);
         }
 
         MouseInput mouseInput = window.getMouseInput();
-        if (mouseInput.isLeftButtonPressed()) {
+        glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//        if (mouseInput.isLeftButtonPressed()) {
             Vector2f displVec = mouseInput.getDisplayVector();
             camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
                     (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
-        }
+//        }
 
 //        if (udpChannel != null) {
 //            String message = String.format("Position: %.2f, %.2f, %.2f", entityPos.x, entityPos.y, entityPos.z);

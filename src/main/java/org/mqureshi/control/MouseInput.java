@@ -45,15 +45,15 @@ public class MouseInput {
         displayVector.x = 0;
         displayVector.y = 0;
         if (previousPosition.x > 0 && previousPosition.y > 0 && inWindow) {
-            double deltax = currentPosition.x - previousPosition.x;
-            double deltay = currentPosition.y - previousPosition.y;
-            boolean rotateX = deltax != 0;
-            boolean rotateY = deltay != 0;
+            double deltaX = currentPosition.x - previousPosition.x;
+            double deltaY = currentPosition.y - previousPosition.y;
+            boolean rotateX = deltaX != 0;
+            boolean rotateY = deltaY != 0;
             if (rotateX) {
-                displayVector.y = (float) deltax;
+                displayVector.y = (float) deltaX;
             }
             if (rotateY) {
-                displayVector.x = (float) deltay;
+                displayVector.x = (float) deltaY;
             }
         }
         previousPosition.x = currentPosition.x;
