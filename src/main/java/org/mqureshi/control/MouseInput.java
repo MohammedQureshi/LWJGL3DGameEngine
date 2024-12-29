@@ -12,6 +12,8 @@ public class MouseInput {
     private boolean leftButtonPressed;
     private Vector2f previousPosition;
     private boolean rightButtonPressed;
+    private boolean wasLeftButtonPressed;
+    private boolean wasRightButtonPressed;
 
     public MouseInput(long windowHandle) {
         previousPosition = new Vector2f(-1, -1);
@@ -20,6 +22,8 @@ public class MouseInput {
         leftButtonPressed = false;
         rightButtonPressed = false;
         inWindow = false;
+        wasLeftButtonPressed = false;
+        wasRightButtonPressed = false;
 
         glfwSetCursorPosCallback(windowHandle, (handle, xPosition, yPosition) -> {
             currentPosition.x = (float) xPosition;
@@ -58,6 +62,17 @@ public class MouseInput {
         }
         previousPosition.x = currentPosition.x;
         previousPosition.y = currentPosition.y;
+    }
+
+    public boolean isLeftButtonPressedOnce() {
+        if (leftButtonPressed && !wasLeftButtonPressed) {
+            wasLeftButtonPressed = true;
+            return true;
+        }
+        if (!leftButtonPressed) {
+            wasLeftButtonPressed = false;
+        }
+        return false;
     }
 
     public boolean isLeftButtonPressed() {

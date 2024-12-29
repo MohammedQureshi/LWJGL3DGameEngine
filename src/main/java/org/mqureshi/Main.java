@@ -30,6 +30,7 @@ public class Main implements GameLogicInterface {
     private Channel udpChannel;
     private InetSocketAddress serverAddress = new InetSocketAddress("localhost", 8080);
     private HandleClient handleClient;
+    private boolean isMouseCaptured = false;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -187,12 +188,16 @@ public class Main implements GameLogicInterface {
         }
 
         MouseInput mouseInput = window.getMouseInput();
-        glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-//        if (mouseInput.isLeftButtonPressed()) {
+        if (mouseInput.isLeftButtonPressedOnce()) {
+            toggleMouseCapture(window);
+            System.out.println(isMouseCaptured);
+        }
+
+        if (isMouseCaptured) {
             Vector2f displVec = mouseInput.getDisplayVector();
             camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
                     (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
-//        }
+        }
 
 //        if (udpChannel != null) {
 //            String message = String.format("Position: %.2f, %.2f, %.2f", entityPos.x, entityPos.y, entityPos.z);
@@ -201,6 +206,11 @@ public class Main implements GameLogicInterface {
 //                    serverAddress
 //            ));
 //        }
+    }
+
+    private void toggleMouseCapture(Window window) {
+        isMouseCaptured = !isMouseCaptured;
+        glfwSetInputMode(window.getWindowHandle(), GLFW_CURSOR, isMouseCaptured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
     }
 
     @Override
