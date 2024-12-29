@@ -2,16 +2,13 @@ package org.mqureshi;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.CharsetUtil;
+import org.joml.Vector2f;
 import org.mqureshi.client.HandleClient;
+import org.mqureshi.control.MouseInput;
 import org.mqureshi.engine.*;
-import org.mqureshi.entities.Entity;
-import org.mqureshi.entities.Material;
-import org.mqureshi.entities.Mesh;
-import org.mqureshi.entities.Model;
+import org.mqureshi.entities.*;
 import org.mqureshi.scenes.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -24,6 +21,8 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Main implements GameLogicInterface {
 
+    private static final float MOUSE_SENSITIVITY = 0.1f;
+    private static final float MOVEMENT_SPEED = 0.005f;
     private Entity cubeEntity;
     private final Vector4f displayInc = new Vector4f();
     private float rotation;
@@ -169,42 +168,38 @@ public class Main implements GameLogicInterface {
 
     @Override
     public void input(Window window, Scene scene, long diffTimeMillis) {
-        displayInc.zero();
-        if (window.isKeyPressed(GLFW_KEY_UP)) {
-            displayInc.y = 1;
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
-            displayInc.y = -1;
-        }
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            displayInc.x = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
-            displayInc.x = 1;
+        float move = diffTimeMillis * MOVEMENT_SPEED;
+        Camera camera = scene.getCamera();
+        if (window.isKeyPressed(GLFW_KEY_W)) {
+            camera.moveForward(move);
+        } else if (window.isKeyPressed(GLFW_KEY_S)) {
+            camera.moveBackwards(move);
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            displayInc.z = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_Q)) {
-            displayInc.z = 1;
+            camera.moveLeft(move);
+        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            camera.moveRight(move);
         }
-        if (window.isKeyPressed(GLFW_KEY_Z)) {
-            displayInc.w = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            displayInc.w = 1;
+        if (window.isKeyPressed(GLFW_KEY_UP)) {
+            camera.moveUp(move);
+        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+            camera.moveDown(move);
         }
 
-        displayInc.mul(diffTimeMillis / 1000.0f);
-
-        Vector3f entityPos = cubeEntity.getPosition();
-        cubeEntity.setPosition(displayInc.x + entityPos.x, displayInc.y + entityPos.y, displayInc.z + entityPos.z);
-        cubeEntity.setScale(cubeEntity.getScale() + displayInc.w);
-        cubeEntity.updateModelMatrix();
-
-        if (udpChannel != null) {
-            String message = String.format("Position: %.2f, %.2f, %.2f", entityPos.x, entityPos.y, entityPos.z);
-            udpChannel.writeAndFlush(new DatagramPacket(
-                    Unpooled.copiedBuffer(message, CharsetUtil.UTF_8),
-                    serverAddress
-            ));
+        MouseInput mouseInput = window.getMouseInput();
+        if (mouseInput.isLeftButtonPressed()) {
+            Vector2f displVec = mouseInput.getDisplayVector();
+            camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
+                    (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
         }
+
+//        if (udpChannel != null) {
+//            String message = String.format("Position: %.2f, %.2f, %.2f", entityPos.x, entityPos.y, entityPos.z);
+//            udpChannel.writeAndFlush(new DatagramPacket(
+//                    Unpooled.copiedBuffer(message, CharsetUtil.UTF_8),
+//                    serverAddress
+//            ));
+//        }
     }
 
     @Override

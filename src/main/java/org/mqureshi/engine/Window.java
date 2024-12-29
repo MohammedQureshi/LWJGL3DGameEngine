@@ -3,6 +3,7 @@ package org.mqureshi.engine;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryUtil;
+import org.mqureshi.control.MouseInput;
 
 import java.util.concurrent.Callable;
 
@@ -16,6 +17,7 @@ public class Window {
     private final Callable<Void> resizeFunc;
     private int height;
     private int width;
+    private MouseInput mouseInput;
 
     public static class WindowOptions {
         public boolean compatibleProfile;
@@ -72,6 +74,12 @@ public class Window {
         glfwGetFramebufferSize(windowHandle, arrWidth, arrHeight);
         width = arrWidth[0];
         height = arrHeight[0];
+
+        mouseInput = new MouseInput(windowHandle);
+    }
+
+    public MouseInput getMouseInput() {
+        return mouseInput;
     }
 
     public void keyCallBack(int key, int action) {

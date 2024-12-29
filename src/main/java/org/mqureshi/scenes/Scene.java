@@ -2,6 +2,7 @@ package org.mqureshi.scenes;
 
 import org.mqureshi.engine.Projection;
 import org.mqureshi.engine.TextureCache;
+import org.mqureshi.entities.Camera;
 import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Model;
 
@@ -13,11 +14,17 @@ public class Scene {
     private final Map<String, Model> modelMap;
     private final Projection projection;
     private final TextureCache textureCache;
+    private final Camera camera;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
         projection = new Projection(width, height);
         textureCache = new TextureCache();
+        camera = new Camera();
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 
     public void addEntity(Entity entity) {

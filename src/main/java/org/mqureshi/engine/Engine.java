@@ -45,6 +45,7 @@ public class Engine {
             deltaFps += (now - initialTime) / timeR;
 
             if(targetFps <= 0 || deltaFps >= 1) {
+                window.getMouseInput().input();
                 gameLogic.input(window, scene, now - initialTime);
             }
 
