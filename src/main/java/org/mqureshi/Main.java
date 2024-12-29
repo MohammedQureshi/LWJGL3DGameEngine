@@ -1,5 +1,12 @@
 package org.mqureshi;
 
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramPacket;
+import io.netty.util.CharsetUtil;
+import org.mqureshi.client.HandleClient;
 import org.mqureshi.engine.*;
 import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Material;
@@ -9,6 +16,7 @@ import org.mqureshi.scenes.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +28,10 @@ public class Main implements GameLogicInterface {
     private final Vector4f displayInc = new Vector4f();
     private float rotation;
 
+    private Channel udpChannel;
+    private InetSocketAddress serverAddress = new InetSocketAddress("localhost", 8080);
+    private HandleClient handleClient;
+
     public static void main(String[] args) {
         Main main = new Main();
         Engine gameEngine = new Engine("LWJGL Game", new Window.WindowOptions(), main);
@@ -28,11 +40,22 @@ public class Main implements GameLogicInterface {
 
     @Override
     public void cleanup() {
-
+        if (handleClient != null) {
+            handleClient.stopClient();  // Cleanup both UDP channel and EventLoopGroup
+        }
     }
 
     @Override
     public void init(Window window, Scene scene, Render render) {
+        // Initialize the game scene
+        initializeGameScene(window, scene, render);
+
+        // Start the UDP client in a separate thread
+        handleClient = new HandleClient();
+        udpChannel = handleClient.startClient(serverAddress);
+    }
+
+    public void initializeGameScene(Window window, Scene scene, Render render) {
         float[] positions = new float[]{
                 // V0
                 -0.5f, 0.5f, 0.5f,
@@ -174,6 +197,14 @@ public class Main implements GameLogicInterface {
         cubeEntity.setPosition(displayInc.x + entityPos.x, displayInc.y + entityPos.y, displayInc.z + entityPos.z);
         cubeEntity.setScale(cubeEntity.getScale() + displayInc.w);
         cubeEntity.updateModelMatrix();
+
+        if (udpChannel != null) {
+            String message = String.format("Position: %.2f, %.2f, %.2f", entityPos.x, entityPos.y, entityPos.z);
+            udpChannel.writeAndFlush(new DatagramPacket(
+                    Unpooled.copiedBuffer(message, CharsetUtil.UTF_8),
+                    serverAddress
+            ));
+        }
     }
 
     @Override
