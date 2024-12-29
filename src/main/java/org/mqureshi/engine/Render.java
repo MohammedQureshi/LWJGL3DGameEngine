@@ -1,4 +1,7 @@
-package org.example;
+package org.mqureshi.engine;
+
+import org.mqureshi.scenes.Scene;
+import org.mqureshi.scenes.SceneRender;
 
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;

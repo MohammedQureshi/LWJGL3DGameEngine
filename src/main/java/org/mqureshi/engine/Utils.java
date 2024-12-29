@@ -1,4 +1,4 @@
-package org.example;
+package org.mqureshi.engine;
 
 import java.io.IOException;
 import java.io.InputStream;

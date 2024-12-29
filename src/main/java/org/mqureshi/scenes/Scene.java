@@ -1,4 +1,9 @@
-package org.example;
+package org.mqureshi.scenes;
+
+import org.mqureshi.engine.Projection;
+import org.mqureshi.engine.TextureCache;
+import org.mqureshi.entities.Entity;
+import org.mqureshi.entities.Model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,10 +12,12 @@ public class Scene {
 
     private final Map<String, Model> modelMap;
     private final Projection projection;
+    private final TextureCache textureCache;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
         projection = new Projection(width, height);
+        textureCache = new TextureCache();
     }
 
     public void addEntity(Entity entity) {
@@ -24,6 +31,10 @@ public class Scene {
 
     public void addModel(Model model) {
         modelMap.put(model.getId(), model);
+    }
+
+    public TextureCache getTextureCache() {
+        return textureCache;
     }
 
     public void cleanup() {

@@ -1,4 +1,6 @@
-package org.example;
+package org.mqureshi.engine;
+
+import org.mqureshi.scenes.Scene;
 
 public class Engine {
 

@@ -1,4 +1,4 @@
-package org.example;
+package org.mqureshi.entities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,16 +7,16 @@ public class Model {
 
     private final String id;
     private final List<Entity> entityList;
-    private final List<Mesh> meshList;
+    private final List<Material> materialList;
 
-    public Model(String id, List<Mesh> meshList) {
+    public Model(String id, List<Material> materialList) {
         this.id = id;
-        this.meshList = meshList;
         entityList = new ArrayList<>();
+        this.materialList = materialList;
     }
 
     public void cleanup() {
-        meshList.forEach(Mesh::cleanup);
+        materialList.forEach(Material::cleanup);
     }
 
     public List<Entity> getEntityList() {
@@ -27,8 +27,8 @@ public class Model {
         return id;
     }
 
-    public List<Mesh> getMeshList() {
-        return meshList;
+    public List<Material> getMaterialList() {
+        return materialList;
     }
 
 }

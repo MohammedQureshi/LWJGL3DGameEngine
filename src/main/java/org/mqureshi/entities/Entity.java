@@ -1,4 +1,4 @@
-package org.example;
+package org.mqureshi.entities;
 
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -8,9 +8,9 @@ public class Entity {
 
     private final String id;
     private final String modelId;
-    private Matrix4f modelMatrix;
-    private Vector3f position;
-    private Quaternionf rotation;
+    private final Matrix4f modelMatrix;
+    private final Vector3f position;
+    private final Quaternionf rotation;
     private float scale;
 
     public Entity(String id, String modelId) {

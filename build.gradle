@@ -38,7 +38,7 @@ dependencies {
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
     implementation group: 'org.joml', name: 'joml', version: '1.10.8'
-    implementation group: 'com.esotericsoftware', name: 'kryonet', version: '2.22.0-RC1'
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.116.Final'
     implementation "org.lwjgl:lwjgl"
     implementation "org.lwjgl:lwjgl-assimp"
     implementation "org.lwjgl:lwjgl-bgfx"

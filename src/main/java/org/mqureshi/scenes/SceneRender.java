@@ -1,10 +1,21 @@
-package org.example;
+package org.mqureshi.scenes;
+
+import org.mqureshi.engine.ShaderProgram;
+import org.mqureshi.engine.Texture;
+import org.mqureshi.engine.TextureCache;
+import org.mqureshi.engine.UniformsMap;
+import org.mqureshi.entities.Entity;
+import org.mqureshi.entities.Material;
+import org.mqureshi.entities.Mesh;
+import org.mqureshi.entities.Model;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -30,17 +41,27 @@ public class SceneRender {
         shaderProgram.bind();
 
         uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjectionMatrix());
+        uniformsMap.setUniform("txtSampler", 0);
 
         Collection<Model> models = scene.getModelMap().values();
+        TextureCache textureCache = scene.getTextureCache();
         for (Model model : models) {
-            model.getMeshList().stream().forEach(mesh -> {
-                glBindVertexArray(mesh.getVaoId());
-                List<Entity> entities = model.getEntityList();
-                for (Entity entity : entities) {
-                    uniformsMap.setUniform("modelMatrix", entity.getModelMatrix());
-                    glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
+            List<Entity> entities = model.getEntityList();
+
+            for (Material material : model.getMaterialList()) {
+                Texture texture = textureCache.getTexture(material.getTexturePath());
+                glActiveTexture(GL_TEXTURE0);
+                texture.bind();
+
+                for (Mesh mesh: material.getMeshList()) {
+                    glBindVertexArray(mesh.getVaoId());
+
+                    for (Entity entity: entities) {
+                        uniformsMap.setUniform("modelMatrix", entity.getModelMatrix());
+                        glDrawElements(GL_TRIANGLES, mesh.getNumVertices(), GL_UNSIGNED_INT, 0);
+                    }
                 }
-            });
+            }
         }
 
         glBindVertexArray(0);
@@ -51,5 +72,6 @@ public class SceneRender {
         uniformsMap = new UniformsMap(shaderProgram.getProgramId());
         uniformsMap.createUniform("projectionMatrix");
         uniformsMap.createUniform("modelMatrix");
+        uniformsMap.createUniform("txtSampler");
     }
 }
