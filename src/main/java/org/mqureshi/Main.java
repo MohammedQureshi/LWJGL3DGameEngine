@@ -56,7 +56,7 @@ public class Main implements GameLogicInterface {
     }
 
     public void initializeGameScene(Window window, Scene scene, Render render) {
-        Model cubeModel = ModelLoader.loadModel("cube-model", "/models/cube/cube.obj",
+        Model cubeModel = ModelLoader.loadModel("cube-model", "assets/cube/cube.obj",
                 scene.getTextureCache());
         scene.addModel(cubeModel);
 

@@ -1,6 +1,7 @@
 package org.mqureshi.engine;
 
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import org.lwjgl.system.MemoryStack;
@@ -8,13 +9,12 @@ import org.mqureshi.entities.Material;
 import org.mqureshi.entities.Mesh;
 import org.mqureshi.entities.Model;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +22,7 @@ import static org.lwjgl.assimp.Assimp.*;
 
 public class ModelLoader {
 
-    private ModelLoader(){
+    private ModelLoader() {
 
     }
 
@@ -32,52 +32,41 @@ public class ModelLoader {
                 aiProcess_PreTransformVertices);
     }
 
+    private static ByteBuffer convertModelIntoBytes(String modelPath) {
+        InputStream modelFile = ModelLoader.class.getClassLoader().getResourceAsStream(modelPath);
+        if (modelFile == null) {
+            throw new RuntimeException("Could not find model file: " + modelPath);
+        }
+        byte[] modelDataInBytes = inputStreamToByteArray(modelFile);
+        ByteBuffer buffer = BufferUtils.createByteBuffer(modelDataInBytes.length);
+        buffer.put(modelDataInBytes);
+        buffer.flip();
+        return buffer;
+    }
+
     public static Model loadModel(String modelId, String modelPath, TextureCache textureCache, int flags) {
-        ByteBuffer modelData;
-
-        try {
-            InputStream resourceAsStream = ModelLoader.class.getResourceAsStream(modelPath);
-            if (resourceAsStream != null) {
-                modelData = readStreamIntoByteBuffer(resourceAsStream);
-            } else {
-                modelData = ByteBuffer.wrap(Files.readAllBytes(Paths.get(modelPath)));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading model file [" + modelPath + "]", e);
+        ByteBuffer buffer = convertModelIntoBytes(modelPath);
+        AIScene scene = Assimp.aiImportFileFromMemory(buffer, flags, (CharSequence) null);
+        if (scene == null) {
+            throw new RuntimeException("Failed to load model from memory.");
         }
 
-        String fileExtension = getFileExtension(modelPath);
-        if (fileExtension == null) {
-            throw new RuntimeException("Unable to determine file format for [" + modelPath + "]");
-        }
-
-        AIScene aiScene = Assimp.aiImportFileFromMemory(modelData, flags, fileExtension);
-        if (aiScene == null) {
-            throw new RuntimeException("Error loading model from memory [" + modelPath + "]");
-        }
-
-        String modelDir = new File(modelPath).getParent();
-
-        int numMaterials = aiScene.mNumMaterials();
+        int numMaterials = scene.mNumMaterials();
         List<Material> materialList = new ArrayList<>();
         for (int i = 0; i < numMaterials; i++) {
-            AIMaterial aiMaterial = AIMaterial.create(aiScene.mMaterials().get(i));
-            materialList.add(processMaterial(aiMaterial, modelDir, textureCache));
+            AIMaterial aiMaterial = AIMaterial.create(scene.mMaterials().get(i));
+            Material material = processMaterial(aiMaterial, modelPath, textureCache);
+            materialList.add(material);
         }
 
-        int numMeshes = aiScene.mNumMeshes();
-        PointerBuffer aiMeshes = aiScene.mMeshes();
+        int numMeshes = scene.mNumMeshes();
+        PointerBuffer aiMeshes = scene.mMeshes();
         Material defaultMaterial = new Material();
         for (int i = 0; i < numMeshes; i++) {
             AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
             Mesh mesh = processMesh(aiMesh);
             int materialIdx = aiMesh.mMaterialIndex();
-            Material material;
-            if (materialIdx >= 0 && materialIdx < materialList.size()) {
-                material = materialList.get(materialIdx);
-            } else {
-                material = defaultMaterial;
-            }
+            Material material = materialIdx >= 0 && materialIdx < materialList.size() ? materialList.get(materialIdx) : defaultMaterial;
             material.getMeshList().add(mesh);
         }
 
@@ -100,16 +89,28 @@ public class ModelLoader {
             }
 
             AIString aiTexturePath = AIString.calloc(stack);
-
             aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, aiTexturePath, (IntBuffer) null,
                     null, null, null, null, null);
             String texturePath = aiTexturePath.dataString();
+
             if (texturePath != null && texturePath.length() > 0) {
                 material.setTexturePath(modelDir + File.separator + new File(texturePath).getName());
-                System.out.println("Resolved texture path: " + texturePath);
                 textureCache.createTexture(material.getTexturePath());
                 material.setDiffuseColor(Material.DEFAULT_COLOR);
             }
+
+//            if (texturePath == null || texturePath.isEmpty()) {
+//                texturePath = "/assets/cube/cube.png";
+//                System.out.println("Using fallback texture path: " + texturePath);
+//            } else {
+//                System.out.println("Texture path: " + texturePath);
+//            }
+//
+//            if (texturePath != null && texturePath.length() > 0) {
+//                material.setTexturePath(texturePath);
+//                textureCache.createTexture(material.getTexturePath());
+//                material.setDiffuseColor(Material.DEFAULT_COLOR);
+//            }
 
             return material;
         }
@@ -158,13 +159,16 @@ public class ModelLoader {
         return data;
     }
 
-    private static ByteBuffer readStreamIntoByteBuffer(InputStream stream) throws IOException {
-        try (stream) {
-            byte[] bytes = stream.readAllBytes();
-            ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
-            buffer.put(bytes);
-            buffer.flip();
-            return buffer;
+    private static byte[] inputStreamToByteArray(InputStream inputStream) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, length);
+            }
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading model file into byte array", e);
         }
     }
 
