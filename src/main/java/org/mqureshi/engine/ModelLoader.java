@@ -141,7 +141,7 @@ public class ModelLoader {
             String texturePath = aiTexturePath.dataString();
 
             if (texturePath != null && texturePath.length() > 0) {
-                material.setTexturePath(File.separator + new File(modelDir).getParent() + File.separator + texturePath);
+                material.setTexturePath((File.separator + new File(modelDir).getParent() + File.separator + texturePath).replace("\\", "/"));
                 textureCache.createTexture(material.getTexturePath());
                 material.setDiffuseColor(Material.DEFAULT_COLOR);
             }
