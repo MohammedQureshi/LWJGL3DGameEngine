@@ -2,6 +2,15 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.mqureshi.Main'
+        )
+    }
 }
 
 group = 'org.example'
@@ -139,4 +148,8 @@ tasks.register('createExe', Exec) {
             '--main-jar', 'LWJGL3DGameEngine-1.0-SNAPSHOT.jar',
             '--main-class', 'org.example.Main',
             '--type', 'exe'
+}
+
+shadowJar {
+    archiveClassifier.set('')
 }
