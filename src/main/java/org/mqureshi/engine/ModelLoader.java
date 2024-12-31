@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.assimp.Assimp.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 public class ModelLoader {
 
@@ -32,27 +33,71 @@ public class ModelLoader {
                 aiProcess_PreTransformVertices);
     }
 
-    private static ByteBuffer convertModelIntoBytes(String modelPath) {
-        InputStream modelFile = ModelLoader.class.getClassLoader().getResourceAsStream(modelPath);
-        if (modelFile == null) {
-            throw new RuntimeException("Could not find model file: " + modelPath);
+    private static ByteBuffer convertModelIntoBytes(String path) {
+        try (InputStream is = ModelLoader.class.getClassLoader().getResourceAsStream(path)) {
+            if (is == null) return null;
+
+            byte[] bytes = inputStreamToByteArray(is);
+            ByteBuffer buffer = BufferUtils.createByteBuffer(bytes.length);
+            buffer.put(bytes);
+            buffer.flip();
+            return buffer;
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading file: " + path, e);
         }
-        byte[] modelDataInBytes = inputStreamToByteArray(modelFile);
-        ByteBuffer buffer = BufferUtils.createByteBuffer(modelDataInBytes.length);
-        buffer.put(modelDataInBytes);
-        buffer.flip();
-        return buffer;
     }
 
     public static Model loadModel(String modelId, String modelPath, TextureCache textureCache, int flags) {
-        ByteBuffer buffer = convertModelIntoBytes(modelPath);
-        AIScene scene = Assimp.aiImportFileFromMemory(buffer, flags, (CharSequence) null);
+        AIFileIO fileIo = AIFileIO.create()
+                .OpenProc((pFileIO, fileName, openMode) -> {
+                    ByteBuffer data = convertModelIntoBytes(memUTF8(fileName));
+                    if (data == null) {
+                        throw new RuntimeException("Could not find file: " + memUTF8(fileName));
+                    }
+
+                    return AIFile.create()
+                            .ReadProc((pFile, pBuffer, size, count) -> {
+                                long max = Math.min(data.remaining() / size, count);
+                                memCopy(memAddress(data), pBuffer, max * size);
+                                data.position(data.position() + (int) (max * size));
+                                return max;
+                            })
+                            .SeekProc((pFile, offset, origin) -> {
+                                if (origin == Assimp.aiOrigin_CUR) {
+                                    data.position(data.position() + (int) offset);
+                                } else if (origin == Assimp.aiOrigin_SET) {
+                                    data.position((int) offset);
+                                } else if (origin == Assimp.aiOrigin_END) {
+                                    data.position(data.limit() + (int) offset);
+                                }
+                                return 0;
+                            })
+                            .FileSizeProc(pFile -> data.limit())
+                            .address();
+                })
+                .CloseProc((pFileIO, pFile) -> {
+                    AIFile aiFile = AIFile.create(pFile);
+                    aiFile.ReadProc().free();
+                    aiFile.SeekProc().free();
+                    aiFile.FileSizeProc().free();
+                });
+
+        AIScene scene = aiImportFileEx(modelPath, flags, fileIo);
+
+        fileIo.OpenProc().free();
+        fileIo.CloseProc().free();
+
         if (scene == null) {
-            throw new RuntimeException("Failed to load model from memory.");
+            throw new RuntimeException("Error loading model: " + aiGetErrorString());
         }
 
+        return processScene(scene, modelId, modelPath, textureCache);
+    }
+
+    private static Model processScene(AIScene scene, String modelId, String modelPath, TextureCache textureCache) {
         int numMaterials = scene.mNumMaterials();
         List<Material> materialList = new ArrayList<>();
+
         for (int i = 0; i < numMaterials; i++) {
             AIMaterial aiMaterial = AIMaterial.create(scene.mMaterials().get(i));
             Material material = processMaterial(aiMaterial, modelPath, textureCache);
@@ -62,9 +107,11 @@ public class ModelLoader {
         int numMeshes = scene.mNumMeshes();
         PointerBuffer aiMeshes = scene.mMeshes();
         Material defaultMaterial = new Material();
+
         for (int i = 0; i < numMeshes; i++) {
             AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
             Mesh mesh = processMesh(aiMesh);
+
             int materialIdx = aiMesh.mMaterialIndex();
             Material material = materialIdx >= 0 && materialIdx < materialList.size() ? materialList.get(materialIdx) : defaultMaterial;
             material.getMeshList().add(mesh);
@@ -94,23 +141,10 @@ public class ModelLoader {
             String texturePath = aiTexturePath.dataString();
 
             if (texturePath != null && texturePath.length() > 0) {
-                material.setTexturePath(modelDir + File.separator + new File(texturePath).getName());
+                material.setTexturePath(File.separator + new File(modelDir).getParent() + File.separator + texturePath);
                 textureCache.createTexture(material.getTexturePath());
                 material.setDiffuseColor(Material.DEFAULT_COLOR);
             }
-
-//            if (texturePath == null || texturePath.isEmpty()) {
-//                texturePath = "/assets/cube/cube.png";
-//                System.out.println("Using fallback texture path: " + texturePath);
-//            } else {
-//                System.out.println("Texture path: " + texturePath);
-//            }
-//
-//            if (texturePath != null && texturePath.length() > 0) {
-//                material.setTexturePath(texturePath);
-//                textureCache.createTexture(material.getTexturePath());
-//                material.setDiffuseColor(Material.DEFAULT_COLOR);
-//            }
 
             return material;
         }
