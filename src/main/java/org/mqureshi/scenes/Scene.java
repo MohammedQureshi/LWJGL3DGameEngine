@@ -5,6 +5,7 @@ import org.mqureshi.engine.TextureCache;
 import org.mqureshi.entities.Camera;
 import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Model;
+import org.mqureshi.gui.IGuiInstance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class Scene {
     private final Projection projection;
     private final TextureCache textureCache;
     private final Camera camera;
+    private IGuiInstance guiInstance;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
@@ -25,6 +27,14 @@ public class Scene {
 
     public Camera getCamera() {
         return camera;
+    }
+
+    public IGuiInstance getGuiInstance() {
+        return guiInstance;
+    }
+
+    public void setGuiInstance(IGuiInstance guiInstance) {
+        this.guiInstance = guiInstance;
     }
 
     public void addEntity(Entity entity) {

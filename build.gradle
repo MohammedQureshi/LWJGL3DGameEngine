@@ -16,26 +16,41 @@ jar {
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 project.ext.lwjglVersion = "3.3.5"
+project.ext.imguiJavaVersion = "1.88.0"
 
 switch (OperatingSystem.current()) {
     case OperatingSystem.LINUX:
         project.ext.lwjglNatives = "natives-linux"
+        project.ext.imguiNatives = "natives-linux"
         def osArch = System.getProperty("os.arch")
         if (osArch.startsWith("arm") || osArch.startsWith("aarch64")) {
             project.ext.lwjglNatives += osArch.contains("64") || osArch.startsWith("armv8") ? "-arm64" : "-arm32"
-        } else if  (osArch.startsWith("ppc")) {
+            project.ext.imguiNatives += osArch.contains("64") || osArch.startsWith("armv8") ? "-arm64" : "-arm32"
+        } else if (osArch.startsWith("ppc")) {
             project.ext.lwjglNatives += "-ppc64le"
-        } else if  (osArch.startsWith("riscv")) {
+            project.ext.imguiNatives += "-ppc64le"
+        } else if (osArch.startsWith("riscv")) {
             project.ext.lwjglNatives += "-riscv64"
+            project.ext.imguiNatives += "-riscv64"
         }
         break
     case OperatingSystem.MAC_OS:
         project.ext.lwjglNatives = "natives-macos-arm64"
+        project.ext.imguiNatives = "natives-macos"
         break
     case OperatingSystem.WINDOWS:
         project.ext.lwjglNatives = "natives-windows"
+        def osArchWin = System.getProperty("os.arch")
+        if (osArchWin.contains("64")) {
+            project.ext.imguiNatives = "natives-windows"
+        } else {
+            project.ext.imguiNatives = "natives-windows-x86"
+        }
         break
+    default:
+        throw new UnsupportedOperationException("Unsupported operating system: " + OperatingSystem.current())
 }
+
 
 repositories {
     mavenCentral()
@@ -126,28 +141,14 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-xxhash::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-yoga::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-zstd::$lwjglNatives"
+
+    // Adding ImGui dependencies
+    implementation "io.github.spair:imgui-java-binding:$imguiJavaVersion"
+    runtimeOnly "io.github.spair:imgui-java-${imguiNatives}:$imguiJavaVersion"
 }
 
 test {
     useJUnitPlatform()
-}
-
-tasks.register('createApp', Exec) {
-    dependsOn jar
-    commandLine 'jpackage', '--input', 'build/libs',
-            '--name', 'LWJGL3DGameEngine-1.0-SNAPSHOT',
-            '--main-jar', 'LWJGL3DGameEngine-1.0-SNAPSHOT.jar',
-            '--main-class', 'org.example.Main',
-            '--type', 'app-image'
-}
-
-tasks.register('createExe', Exec) {
-    dependsOn jar
-    commandLine 'jpackage', '--input', 'build/libs',
-            '--name', 'LWJGL3DGameEngine-1.0-SNAPSHOT',
-            '--main-jar', 'LWJGL3DGameEngine-1.0-SNAPSHOT.jar',
-            '--main-class', 'org.example.Main',
-            '--type', 'exe'
 }
 
 shadowJar {

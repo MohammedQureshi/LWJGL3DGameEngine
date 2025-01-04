@@ -1,5 +1,6 @@
 package org.mqureshi.engine;
 
+import org.mqureshi.gui.IGuiInstance;
 import org.mqureshi.scenes.Scene;
 
 public class Engine {
@@ -21,7 +22,7 @@ public class Engine {
         targetFps = options.fps;
         targetUps = options.ups;
         this.gameLogic = gameLogic;
-        render = new Render();
+        render = new Render(window);
         scene = new Scene(window.getWidth(), window.getHeight());
         gameLogic.init(window, scene, render);
         running = true;
@@ -37,6 +38,7 @@ public class Engine {
         float deltaFps = 0;
 
         long updateTime = initialTime;
+        IGuiInstance iGuiInstance = scene.getGuiInstance();
         while(running && !window.windowShouldClose()) {
             window.pollEvents();
 
@@ -46,7 +48,8 @@ public class Engine {
 
             if(targetFps <= 0 || deltaFps >= 1) {
                 window.getMouseInput().input();
-                gameLogic.input(window, scene, now - initialTime);
+                boolean inputConsumed = iGuiInstance != null && iGuiInstance.handleGuiInput(scene, window);
+                gameLogic.input(window, scene, now - initialTime, inputConsumed);
             }
 
             if (deltaUpdate >= 1) {
@@ -83,7 +86,10 @@ public class Engine {
     }
 
     private void resize() {
-        scene.resize(window.getWidth(), window.getHeight());
+        int width = window.getWidth();
+        int height = window.getHeight();
+        scene.resize(width, height);
+        render.resize(width, height);
     }
 
 }

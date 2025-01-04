@@ -1,5 +1,8 @@
 package org.mqureshi;
 
+import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.flag.ImGuiCond;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.DatagramPacket;
@@ -9,6 +12,7 @@ import org.mqureshi.client.HandleClient;
 import org.mqureshi.control.MouseInput;
 import org.mqureshi.engine.*;
 import org.mqureshi.entities.*;
+import org.mqureshi.gui.IGuiInstance;
 import org.mqureshi.scenes.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -19,7 +23,7 @@ import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Main implements GameLogicInterface {
+public class Main implements GameLogicInterface, IGuiInstance {
 
     private static final float MOUSE_SENSITIVITY = 0.1f;
     private static final float MOVEMENT_SPEED = 0.005f;
@@ -63,10 +67,13 @@ public class Main implements GameLogicInterface {
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
         cubeEntity.setPosition(0,0,-2);
         scene.addEntity(cubeEntity);
+        scene.setGuiInstance(this);
     }
 
     @Override
-    public void input(Window window, Scene scene, long diffTimeMillis) {
+    public void input(Window window, Scene scene, long diffTimeMillis, boolean inputConsumed) {
+        if (inputConsumed) return;
+
         float move = diffTimeMillis * MOVEMENT_SPEED;
         Camera camera = scene.getCamera();
         if (window.isKeyPressed(GLFW_KEY_W)) {
@@ -118,5 +125,26 @@ public class Main implements GameLogicInterface {
         }
         cubeEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
         cubeEntity.updateModelMatrix();
+    }
+
+    @Override
+    public void drawGui() {
+        ImGui.newFrame();
+        ImGui.setNextWindowPos(0, 0, ImGuiCond.Always);
+        ImGui.showDemoWindow();
+        ImGui.endFrame();
+        ImGui.render();
+    }
+
+    @Override
+    public boolean handleGuiInput(Scene scene, Window window) {
+        ImGuiIO imGuiIO = ImGui.getIO();
+        MouseInput mouseInput = window.getMouseInput();
+        Vector2f mousePos = mouseInput.getCurrentPosition();
+        imGuiIO.addMousePosEvent(mousePos.x, mousePos.y);
+        imGuiIO.addMouseButtonEvent(0, mouseInput.isLeftButtonPressed());
+        imGuiIO.addMouseButtonEvent(1, mouseInput.isRightButtonPressed());
+
+        return imGuiIO.getWantCaptureMouse() || imGuiIO.getWantCaptureKeyboard();
     }
 }
