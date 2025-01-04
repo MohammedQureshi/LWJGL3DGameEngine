@@ -73,7 +73,7 @@ public class GuiRender {
         int numLists = drawData.getCmdListsCount();
         for (int i = 0; i < numLists; i++) {
             glBufferData(GL_ARRAY_BUFFER, drawData.getCmdListVtxBufferData(i), GL_STREAM_DRAW);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawData.getCmdListVtxBufferData(i), GL_STREAM_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawData.getCmdListIdxBufferData(i), GL_STREAM_DRAW);
 
             int numCmds = drawData.getCmdListCmdBufferSize(i);
             for (int j = 0; j < numCmds; j++) {
