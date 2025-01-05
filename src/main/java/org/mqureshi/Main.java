@@ -1,8 +1,8 @@
 package org.mqureshi;
 
-import imgui.ImGui;
-import imgui.ImGuiIO;
-import imgui.flag.ImGuiCond;
+import imgui.*;
+import imgui.flag.ImGuiStyleVar;
+import imgui.flag.ImGuiWindowFlags;
 import io.netty.channel.Channel;
 import org.joml.Vector2f;
 import org.mqureshi.client.HandleClient;
@@ -47,7 +47,7 @@ public class Main implements GameLogicInterface, IGuiInstance {
     public void init(Window window, Scene scene, Render render) {
         // Initialize the game scene
         initializeGameScene(window, scene, render);
-        
+
         // Start the UDP client in a separate thread
         handleClient = new HandleClient();
         udpChannel = handleClient.startClient(serverAddress);
@@ -124,7 +124,45 @@ public class Main implements GameLogicInterface, IGuiInstance {
     @Override
     public void drawGui() {
         ImGui.newFrame();
-        ImGui.setNextWindowPos(0, 0, ImGuiCond.Always);
+
+        //Basic Inventory Bar will be remade
+        ImGuiViewport viewport = ImGui.getMainViewport();
+        float viewportWidth = viewport.getSizeX();
+        float viewportHeight = viewport.getSizeY();
+        float boxWidth = 100;  // Width of each inventory box
+        float boxHeight = 100; // Height of each inventory box
+        float spacing = 10;   // Spacing between the boxes
+        int numBoxes = 8;     // Number of inventory boxes
+
+        float totalWidth = numBoxes * (boxWidth + spacing) - spacing;
+
+        float startX = (viewportWidth - totalWidth) / 2;
+        float startY = viewportHeight - boxHeight - 10;
+
+        float windowWidth = totalWidth;
+        float windowHeight = boxHeight + 20;
+
+        ImGui.setNextWindowPos(startX, startY);
+        ImGui.setNextWindowSize(windowWidth, windowHeight);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
+
+        ImGui.begin("InvisibleWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |
+                ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoSavedSettings);
+
+        for (int i = 0; i < numBoxes; i++) {
+            ImGui.button("##box" + i, new ImVec2(boxWidth, boxHeight)); // Unique ID for each box
+            if (i < numBoxes - 1) {
+                ImGui.sameLine(); // Place the next box on the same line
+            }
+        }
+
+        ImGui.end();
+        ImGui.popStyleVar(2);
+        //
+
         ImGui.showDemoWindow();
         ImGui.endFrame();
         ImGui.render();

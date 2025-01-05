@@ -82,6 +82,17 @@ public class MouseInput {
         return false;
     }
 
+    public boolean isRightButtonPressedOnce() {
+        if (rightButtonPressed && !wasRightButtonPressed) {
+            wasRightButtonPressed = true;
+            return true;
+        }
+        if (!rightButtonPressed) {
+            wasRightButtonPressed = false;
+        }
+        return false;
+    }
+
     public boolean isLeftButtonPressed() {
         return leftButtonPressed;
     }
