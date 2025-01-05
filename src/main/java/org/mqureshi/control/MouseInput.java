@@ -14,6 +14,8 @@ public class MouseInput {
     private boolean rightButtonPressed;
     private boolean wasLeftButtonPressed;
     private boolean wasRightButtonPressed;
+    private float xScale;
+    private float yScale;
 
     public MouseInput(long windowHandle) {
         previousPosition = new Vector2f(-1, -1);
@@ -25,11 +27,17 @@ public class MouseInput {
         wasLeftButtonPressed = false;
         wasRightButtonPressed = false;
 
-        glfwSetCursorPosCallback(windowHandle, (handle, xPosition, yPosition) -> {
-            currentPosition.x = (float) xPosition;
-            currentPosition.y = (float) yPosition;
-        });
+        float[] xScaleArray = new float[1];
+        float[] yScaleArray = new float[1];
+        glfwGetWindowContentScale(windowHandle, xScaleArray, yScaleArray);
+        xScale = xScaleArray[0];
+        yScale = yScaleArray[0];
 
+        glfwSetCursorPosCallback(windowHandle, (handle, xPosition, yPosition) -> {
+            currentPosition.x = (float) xPosition * xScale;
+            currentPosition.y = (float) yPosition * yScale;
+        });
+        glfwGetWindowAttrib(windowHandle, GLFW_FOCUSED);
         glfwSetCursorEnterCallback(windowHandle, (handle, entered) -> inWindow = entered);
         glfwSetMouseButtonCallback(windowHandle, (handle, button, action, mode) -> {
             leftButtonPressed = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;

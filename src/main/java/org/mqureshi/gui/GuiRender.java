@@ -140,12 +140,12 @@ public class GuiRender {
             }
         });
 
-        glfwSetCharCallback(window.getWindowHandle(), (handle, charactors) -> {
+        glfwSetCharCallback(window.getWindowHandle(), (handle, characters) -> {
             ImGuiIO io = ImGui.getIO();
             if (!io.getWantCaptureKeyboard()) {
                 return;
             }
-            io.addInputCharacter(charactors);
+            io.addInputCharacter(characters);
         });
     }
 
