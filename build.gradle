@@ -15,7 +15,7 @@ jar {
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
-project.ext.lwjglVersion = "3.3.5"
+project.ext.lwjglVersion = "3.3.6"
 project.ext.imguiJavaVersion = "1.88.0"
 
 switch (OperatingSystem.current()) {

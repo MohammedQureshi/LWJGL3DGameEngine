@@ -3,10 +3,7 @@ package org.mqureshi;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.socket.DatagramPacket;
-import io.netty.util.CharsetUtil;
 import org.joml.Vector2f;
 import org.mqureshi.client.HandleClient;
 import org.mqureshi.control.MouseInput;
@@ -14,12 +11,9 @@ import org.mqureshi.engine.*;
 import org.mqureshi.entities.*;
 import org.mqureshi.gui.IGuiInstance;
 import org.mqureshi.scenes.Scene;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -53,7 +47,7 @@ public class Main implements GameLogicInterface, IGuiInstance {
     public void init(Window window, Scene scene, Render render) {
         // Initialize the game scene
         initializeGameScene(window, scene, render);
-
+        
         // Start the UDP client in a separate thread
         handleClient = new HandleClient();
         udpChannel = handleClient.startClient(serverAddress);

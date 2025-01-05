@@ -37,7 +37,6 @@ public class MouseInput {
             currentPosition.x = (float) xPosition * xScale;
             currentPosition.y = (float) yPosition * yScale;
         });
-        glfwGetWindowAttrib(windowHandle, GLFW_FOCUSED);
         glfwSetCursorEnterCallback(windowHandle, (handle, entered) -> inWindow = entered);
         glfwSetMouseButtonCallback(windowHandle, (handle, button, action, mode) -> {
             leftButtonPressed = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
