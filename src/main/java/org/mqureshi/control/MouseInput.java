@@ -33,16 +33,30 @@ public class MouseInput {
         xScale = xScaleArray[0];
         yScale = yScaleArray[0];
 
+        int[] framebufferWidth = new int[1];
+        int[] framebufferHeight = new int[1];
+        glfwGetFramebufferSize(windowHandle, framebufferWidth, framebufferHeight);
+
+        int[] windowWidth = new int[1];
+        int[] windowHeight = new int[1];
+        glfwGetWindowSize(windowHandle, windowWidth, windowHeight);
+
+        float widthRatio = framebufferWidth[0] / (float) windowWidth[0];
+        float heightRatio = framebufferHeight[0] / (float) windowHeight[0];
+
         glfwSetCursorPosCallback(windowHandle, (handle, xPosition, yPosition) -> {
-            currentPosition.x = (float) xPosition * xScale;
-            currentPosition.y = (float) yPosition * yScale;
+            currentPosition.x = (float) xPosition * widthRatio;
+            currentPosition.y = (float) yPosition * heightRatio;
         });
+
         glfwSetCursorEnterCallback(windowHandle, (handle, entered) -> inWindow = entered);
+
         glfwSetMouseButtonCallback(windowHandle, (handle, button, action, mode) -> {
             leftButtonPressed = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
             rightButtonPressed = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS;
         });
     }
+
 
     public Vector2f getCurrentPosition() {
         return currentPosition;
