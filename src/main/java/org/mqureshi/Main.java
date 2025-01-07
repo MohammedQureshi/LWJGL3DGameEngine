@@ -93,8 +93,11 @@ public class Main implements GameLogicInterface, IGuiInstance {
 
         if (isMouseCaptured) {
             Vector2f displVec = mouseInput.getDisplayVector();
-            camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
-                    (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
+            float rotationX = (float) Math.toRadians(displVec.y * MOUSE_SENSITIVITY);
+            float rotationY = (float) Math.toRadians(displVec.x * MOUSE_SENSITIVITY);
+
+            // Optional: Clamp vertical rotation to avoid camera flipping
+            camera.addRotation(rotationY, rotationX);
         }
 
 //        if (udpChannel != null) {
