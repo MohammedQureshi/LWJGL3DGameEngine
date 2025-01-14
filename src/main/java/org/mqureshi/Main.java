@@ -1,28 +1,31 @@
 package org.mqureshi;
 
-import imgui.*;
-import imgui.flag.ImGuiStyleVar;
-import imgui.flag.ImGuiWindowFlags;
 import io.netty.channel.Channel;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.mqureshi.client.HandleClient;
 import org.mqureshi.control.MouseInput;
-import org.mqureshi.engine.*;
+import org.mqureshi.engine.light.LightControls;
+import org.mqureshi.engine.light.point.PointLight;
+import org.mqureshi.engine.light.spot.SpotLight;
+import org.mqureshi.engine.model.ModelLoader;
+import org.mqureshi.engine.interfaces.GameLogicInterface;
+import org.mqureshi.engine.util.Engine;
+import org.mqureshi.engine.util.Render;
+import org.mqureshi.engine.util.Window;
 import org.mqureshi.entities.*;
-import org.mqureshi.gui.IGuiInstance;
 import org.mqureshi.scenes.Scene;
-import org.joml.Vector4f;
+import org.mqureshi.scenes.SceneLights;
 
 import java.net.InetSocketAddress;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Main implements GameLogicInterface, IGuiInstance {
+public class Main implements GameLogicInterface {
 
     private static final float MOUSE_SENSITIVITY = 0.1f;
     private static final float MOVEMENT_SPEED = 0.005f;
     private Entity cubeEntity;
-    private final Vector4f displayInc = new Vector4f();
     private float rotation;
 
     private Channel udpChannel;
@@ -46,22 +49,35 @@ public class Main implements GameLogicInterface, IGuiInstance {
     @Override
     public void init(Window window, Scene scene, Render render) {
         // Initialize the game scene
-        initializeGameScene(window, scene, render);
+        initializeGameScene(scene);
 
         // Start the UDP client in a separate thread
         handleClient = new HandleClient();
         udpChannel = handleClient.startClient(serverAddress);
     }
 
-    public void initializeGameScene(Window window, Scene scene, Render render) {
+    public void initializeGameScene( Scene scene) {
         Model cubeModel = ModelLoader.loadModel("cube-model", "assets/cube/cube.obj",
                 scene.getTextureCache());
         scene.addModel(cubeModel);
 
         cubeEntity = new Entity("cube-entity", cubeModel.getId());
         cubeEntity.setPosition(0,0,-2);
+        cubeEntity.updateModelMatrix();
         scene.addEntity(cubeEntity);
-        scene.setGuiInstance(this);
+
+        SceneLights sceneLights = new SceneLights();
+        sceneLights.getAmbientLight().setIntensity(0.3f);
+        scene.setSceneLights(sceneLights);
+        sceneLights.getPointLights().add(new PointLight(new Vector3f(1, 1, 1),
+                new Vector3f(0, 0, -1.4f), 1.0f));
+
+        Vector3f coneDir = new Vector3f(0, 0, -1);
+        sceneLights.getSpotLights().add(new SpotLight(new PointLight(new Vector3f(1, 1, 1),
+                new Vector3f(0, 0, -1.4f), 0.0f), coneDir, 140.0f));
+
+        LightControls lightControls = new LightControls(scene);
+        scene.setGuiInstance(lightControls);
     }
 
     @Override
@@ -122,64 +138,5 @@ public class Main implements GameLogicInterface, IGuiInstance {
         }
         cubeEntity.setRotation(1, 1, 1, (float) Math.toRadians(rotation));
         cubeEntity.updateModelMatrix();
-    }
-
-    @Override
-    public void drawGui() {
-        ImGui.newFrame();
-
-        //Basic Inventory Bar will be remade
-        ImGuiViewport viewport = ImGui.getMainViewport();
-        float viewportWidth = viewport.getSizeX();
-        float viewportHeight = viewport.getSizeY();
-        float boxWidth = 100;  // Width of each inventory box
-        float boxHeight = 100; // Height of each inventory box
-        float spacing = 10;   // Spacing between the boxes
-        int numBoxes = 8;     // Number of inventory boxes
-
-        float totalWidth = numBoxes * (boxWidth + spacing) - spacing;
-
-        float startX = (viewportWidth - totalWidth) / 2;
-        float startY = viewportHeight - boxHeight - 10;
-
-        float windowWidth = totalWidth;
-        float windowHeight = boxHeight + 20;
-
-        ImGui.setNextWindowPos(startX, startY);
-        ImGui.setNextWindowSize(windowWidth, windowHeight);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
-
-        ImGui.begin("InvisibleWindow", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |
-                ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollbar |
-                ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoCollapse |
-                ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoSavedSettings);
-
-        for (int i = 0; i < numBoxes; i++) {
-            ImGui.button("##box" + i, new ImVec2(boxWidth, boxHeight)); // Unique ID for each box
-            if (i < numBoxes - 1) {
-                ImGui.sameLine(); // Place the next box on the same line
-            }
-        }
-
-        ImGui.end();
-        ImGui.popStyleVar(2);
-        //
-
-        ImGui.showDemoWindow();
-        ImGui.endFrame();
-        ImGui.render();
-    }
-
-    @Override
-    public boolean handleGuiInput(Scene scene, Window window) {
-        ImGuiIO imGuiIO = ImGui.getIO();
-        MouseInput mouseInput = window.getMouseInput();
-        Vector2f mousePos = mouseInput.getCurrentPosition();
-        imGuiIO.addMousePosEvent(mousePos.x, mousePos.y);
-        imGuiIO.addMouseButtonEvent(0, mouseInput.isLeftButtonPressed());
-        imGuiIO.addMouseButtonEvent(1, mouseInput.isRightButtonPressed());
-
-        return imGuiIO.getWantCaptureMouse() || imGuiIO.getWantCaptureKeyboard();
     }
 }

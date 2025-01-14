@@ -1,6 +1,6 @@
 package org.mqureshi.gui;
 
-import org.mqureshi.engine.Window;
+import org.mqureshi.engine.util.Window;
 import org.mqureshi.scenes.Scene;
 
 public interface IGuiInstance {

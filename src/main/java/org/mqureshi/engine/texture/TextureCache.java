@@ -1,4 +1,4 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.texture;
 
 import java.util.Collection;
 import java.util.HashMap;

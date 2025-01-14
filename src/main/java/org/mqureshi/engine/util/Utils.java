@@ -1,4 +1,6 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.util;
+
+import org.mqureshi.engine.shader.ShaderProgram;
 
 import java.io.IOException;
 import java.io.InputStream;

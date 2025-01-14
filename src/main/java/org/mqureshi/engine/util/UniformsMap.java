@@ -1,7 +1,8 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.util;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 
@@ -34,7 +35,7 @@ public class UniformsMap {
         if (location == null) {
             throw new RuntimeException("Could not find uniform [" + uniformName + "]");
         }
-        return location.intValue();
+        return location;
     }
 
     public void setUniform(String uniformName, int value) {
@@ -53,5 +54,13 @@ public class UniformsMap {
 
     public void setUniform(String uniformName, Vector2f value) {
         glUniform2f(getUniformLocation(uniformName), value.x, value.y);
+    }
+
+    public void setUniform(String uniformName, float value) {
+        glUniform1f(getUniformLocation(uniformName), value);
+    }
+
+    public void setUniform(String uniformName, Vector3f value) {
+        glUniform3f(getUniformLocation(uniformName), value.x, value.y, value.z);
     }
 }

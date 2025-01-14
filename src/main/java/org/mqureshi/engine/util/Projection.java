@@ -1,4 +1,4 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.util;
 
 import org.joml.Matrix4f;
 

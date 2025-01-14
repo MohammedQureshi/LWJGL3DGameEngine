@@ -1,6 +1,7 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.shader;
 
 import org.lwjgl.opengl.GL30;
+import org.mqureshi.engine.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;

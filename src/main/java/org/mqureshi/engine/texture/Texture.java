@@ -1,4 +1,4 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.texture;
 
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;

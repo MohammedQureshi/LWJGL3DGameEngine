@@ -1,4 +1,4 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.util;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -17,7 +17,7 @@ public class Window {
     private final Callable<Void> resizeFunc;
     private int height;
     private int width;
-    private MouseInput mouseInput;
+    private final MouseInput mouseInput;
 
     public static class WindowOptions {
         public boolean compatibleProfile;

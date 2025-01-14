@@ -1,5 +1,7 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.interfaces;
 
+import org.mqureshi.engine.util.Render;
+import org.mqureshi.engine.util.Window;
 import org.mqureshi.scenes.Scene;
 
 public interface GameLogicInterface {

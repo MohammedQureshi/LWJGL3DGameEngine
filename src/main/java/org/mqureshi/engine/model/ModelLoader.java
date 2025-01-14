@@ -1,10 +1,11 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.model;
 
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 import org.lwjgl.system.MemoryStack;
+import org.mqureshi.engine.texture.TextureCache;
 import org.mqureshi.entities.Material;
 import org.mqureshi.entities.Mesh;
 import org.mqureshi.entities.Model;
@@ -135,6 +136,26 @@ public class ModelLoader {
                 material.setDiffuseColor(new Vector4f(color.r(), color.g(), color.b(), color.a()));
             }
 
+            result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, aiTextureType_NONE, 0, color);
+            if (result == aiReturn_SUCCESS) {
+                material.setDiffuseColor(new Vector4f(color.r(), color.g(), color.b(), color.a()));
+            }
+
+            result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, aiTextureType_NONE, 0,
+                    color);
+            if (result == aiReturn_SUCCESS) {
+                material.setSpecularColor(new Vector4f(color.r(), color.g(), color.b(), color.a()));
+            }
+
+            float reflectance = 0.0f;
+            float[] shininessFactor = new float[]{0.0f};
+            int[] pMax = new int[]{1};
+            result = aiGetMaterialFloatArray(aiMaterial, AI_MATKEY_SHININESS_STRENGTH, aiTextureType_NONE, 0, shininessFactor, pMax);
+            if (result != aiReturn_SUCCESS) {
+                reflectance = shininessFactor[0];
+            }
+            material.setReflectance(reflectance);
+
             AIString aiTexturePath = AIString.calloc(stack);
             aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, aiTexturePath, (IntBuffer) null,
                     null, null, null, null, null);
@@ -152,6 +173,7 @@ public class ModelLoader {
 
     private static Mesh processMesh(AIMesh aiMesh) {
         float[] vertices = processVertices(aiMesh);
+        float[] normals = processNormals(aiMesh);
         float[] textCoords = processTextCoords(aiMesh);
         int[] indices = processIndices(aiMesh);
 
@@ -161,7 +183,7 @@ public class ModelLoader {
             textCoords = new float[numElements];
         }
 
-        return new Mesh(vertices, textCoords, indices);
+        return new Mesh(vertices, normals, textCoords, indices);
     }
 
     private static int[] processIndices(AIMesh aiMesh) {
@@ -219,12 +241,17 @@ public class ModelLoader {
         return data;
     }
 
-    private static String getFileExtension(String filePath) {
-        int dotIndex = filePath.lastIndexOf('.');
-        if (dotIndex == -1 || dotIndex == filePath.length() - 1) {
-            return null;
+    private static float[] processNormals(AIMesh aiMesh) {
+        AIVector3D.Buffer buffer = aiMesh.mNormals();
+        float[] data = new float[buffer.remaining() * 3];
+        int pos = 0;
+        while (buffer.remaining() > 0) {
+            AIVector3D normal = buffer.get();
+            data[pos++] = normal.x();
+            data[pos++] = normal.y();
+            data[pos++] = normal.z();
         }
-        return filePath.substring(dotIndex + 1).toLowerCase(); // Return extension in lowercase
+        return data;
     }
 
 }

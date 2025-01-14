@@ -8,10 +8,10 @@ import imgui.flag.ImGuiKey;
 import imgui.type.ImInt;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.mqureshi.engine.ShaderProgram;
-import org.mqureshi.engine.Texture;
-import org.mqureshi.engine.UniformsMap;
-import org.mqureshi.engine.Window;
+import org.mqureshi.engine.shader.ShaderProgram;
+import org.mqureshi.engine.texture.Texture;
+import org.mqureshi.engine.util.UniformsMap;
+import org.mqureshi.engine.util.Window;
 import org.mqureshi.scenes.Scene;
 
 import java.nio.ByteBuffer;

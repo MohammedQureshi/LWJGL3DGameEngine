@@ -1,7 +1,7 @@
 package org.mqureshi.scenes;
 
-import org.mqureshi.engine.Projection;
-import org.mqureshi.engine.TextureCache;
+import org.mqureshi.engine.util.Projection;
+import org.mqureshi.engine.texture.TextureCache;
 import org.mqureshi.entities.Camera;
 import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Model;
@@ -17,6 +17,7 @@ public class Scene {
     private final TextureCache textureCache;
     private final Camera camera;
     private IGuiInstance guiInstance;
+    private SceneLights sceneLights;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
@@ -68,6 +69,14 @@ public class Scene {
 
     public void resize(int width, int height) {
         projection.updateProjectionMatrix(width, height);
+    }
+
+    public SceneLights getSceneLights() {
+        return sceneLights;
+    }
+
+    public void setSceneLights(SceneLights sceneLights) {
+        this.sceneLights = sceneLights;
     }
 
 }

@@ -1,4 +1,4 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.util;
 
 import org.mqureshi.gui.GuiRender;
 import org.mqureshi.scenes.Scene;
@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class Render {
 
     private final SceneRender sceneRender;
-    private GuiRender guiRender;
+    private final GuiRender guiRender;
 
     public Render(Window window) {
         createCapabilities();

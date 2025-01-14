@@ -1,5 +1,6 @@
-package org.mqureshi.engine;
+package org.mqureshi.engine.util;
 
+import org.mqureshi.engine.interfaces.GameLogicInterface;
 import org.mqureshi.gui.IGuiInstance;
 import org.mqureshi.scenes.Scene;
 
