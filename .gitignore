@@ -41,4 +41,4 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-**/src/main/resources/assets
+/src/main/resources/assets
