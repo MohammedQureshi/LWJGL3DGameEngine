@@ -1,5 +1,6 @@
 package org.mqureshi.engine.util;
 
+import org.mqureshi.engine.skybox.SkyboxRender;
 import org.mqureshi.gui.GuiRender;
 import org.mqureshi.scenes.Scene;
 import org.mqureshi.scenes.SceneRender;
@@ -11,6 +12,7 @@ public class Render {
 
     private final SceneRender sceneRender;
     private final GuiRender guiRender;
+    private SkyboxRender skyboxRender;
 
     public Render(Window window) {
         createCapabilities();
@@ -19,6 +21,7 @@ public class Render {
         glCullFace(GL_BACK);
         sceneRender = new SceneRender();
         guiRender = new GuiRender(window);
+        skyboxRender = new SkyboxRender();
     }
 
     public void cleanup() {
@@ -29,6 +32,7 @@ public class Render {
     public void render(Window window, Scene scene) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, window.getWidth(), window.getHeight());
+        skyboxRender.render(scene);
         sceneRender.render(scene);
         guiRender.render(scene);
     }
