@@ -25,9 +25,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class Main implements GameLogicInterface {
 
     private static final float MOUSE_SENSITIVITY = 0.1f;
-    private static final float MOVEMENT_SPEED = 0.005f;
-    private Entity cubeEntity;
-    private float rotation;
+    private static final float MOVEMENT_SPEED = 0.001f;
     private static final int NUM_CHUNKS = 4;
     private Entity[][] terrainEntities;
 
@@ -84,8 +82,6 @@ public class Main implements GameLogicInterface {
         mageModelEntity.updateModelMatrix();
         scene.addEntity(mageModelEntity);
 
-        System.out.println(scene);
-
         SceneLights sceneLights = new SceneLights();
         sceneLights.getAmbientLight().setIntensity(0.3f);
         scene.setSceneLights(sceneLights);
@@ -112,17 +108,19 @@ public class Main implements GameLogicInterface {
     public void input(Window window, Scene scene, long diffTimeMillis, boolean inputConsumed) {
         if (inputConsumed) return;
 
+        Entity mageEntity = scene.getModelMap().get("mage-model").getEntityList().getFirst();
+
         float move = diffTimeMillis * MOVEMENT_SPEED;
         Camera camera = scene.getCamera();
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            camera.moveForward(move);
+            mageEntity.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y, mageEntity.getPosition().z + move);
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            camera.moveBackwards(move);
+            mageEntity.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y, mageEntity.getPosition().z - move);
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            camera.moveLeft(move);
+            mageEntity.setPosition(mageEntity.getPosition().x + move, mageEntity.getPosition().y, mageEntity.getPosition().z);
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            camera.moveRight(move);
+            mageEntity.setPosition(mageEntity.getPosition().x - move, mageEntity.getPosition().y, mageEntity.getPosition().z);
         }
         if (window.isKeyPressed(GLFW_KEY_SPACE)) {
             camera.moveUp(move);
@@ -142,6 +140,7 @@ public class Main implements GameLogicInterface {
 
             // Optional: Clamp vertical rotation to avoid camera flipping
             camera.addRotation(rotationY, rotationX);
+//            camera.followPlayer(mageEntity.getPosition(), 1f, 1f, 1f);
         }
 
 //        if (udpChannel != null) {
@@ -173,15 +172,18 @@ public class Main implements GameLogicInterface {
     }
 
     public void updateTerrain(Scene scene) {
+
         Camera camera = scene.getCamera();
-        Vector3f cameraPos = camera.getPosition();
 
         Entity mageEntity = scene.getModelMap().get("mage-model").getEntityList().getFirst();
-        mageEntity.setRotation(1, 1, 1, 60);
+//        mageEntity.setRotation(1, 1, 1, 60);
         mageEntity.updateModelMatrix();
+
+        camera.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y + 0.5f, mageEntity.getPosition().z - 0.5f);
 
 
         int cellSize = 10;
+        Vector3f cameraPos = camera.getPosition();
         int cellCol = (int) (cameraPos.x / cellSize);
         int cellRow = (int) (cameraPos.z / cellSize);
 
