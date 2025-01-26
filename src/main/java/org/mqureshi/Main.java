@@ -38,7 +38,7 @@ public class Main implements GameLogicInterface {
 
     public static void main(String[] args) {
         Main main = new Main();
-        Engine gameEngine = new Engine("LWJGL Game", new Window.WindowOptions(), main);
+        Engine gameEngine = new Engine("Lunar Realms", new Window.WindowOptions(), main);
         gameEngine.start();
     }
 
@@ -76,12 +76,22 @@ public class Main implements GameLogicInterface {
             }
         }
 
+        Model mageModel = ModelLoader.loadModel("mage-model", "assets/mage/mage.obj",
+                scene.getTextureCache());
+        scene.addModel(mageModel);
+        Entity mageModelEntity = new Entity("mage-model","mage-model");
+        mageModelEntity.setScale(0.1f);
+        mageModelEntity.updateModelMatrix();
+        scene.addEntity(mageModelEntity);
+
+        System.out.println(scene);
+
         SceneLights sceneLights = new SceneLights();
         sceneLights.getAmbientLight().setIntensity(0.3f);
         scene.setSceneLights(sceneLights);
 
         Skybox skyBox = new Skybox("assets/skybox/skybox.obj", scene.getTextureCache());
-        skyBox.getSkyBoxEntity().setScale(50);
+        skyBox.getSkyBoxEntity().setScale(10);
         scene.setSkybox(skyBox);
 
         scene.getCamera().moveUp(0.1f);
@@ -163,9 +173,15 @@ public class Main implements GameLogicInterface {
     }
 
     public void updateTerrain(Scene scene) {
-        int cellSize = 10;
         Camera camera = scene.getCamera();
         Vector3f cameraPos = camera.getPosition();
+
+        Entity mageEntity = scene.getModelMap().get("mage-model").getEntityList().getFirst();
+        mageEntity.setRotation(1, 1, 1, 60);
+        mageEntity.updateModelMatrix();
+
+
+        int cellSize = 10;
         int cellCol = (int) (cameraPos.x / cellSize);
         int cellRow = (int) (cameraPos.z / cellSize);
 
