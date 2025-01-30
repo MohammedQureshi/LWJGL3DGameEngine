@@ -88,6 +88,7 @@ public class Main implements GameLogicInterface {
 
         Skybox skyBox = new Skybox("assets/skybox/skybox.obj", scene.getTextureCache());
         skyBox.getSkyBoxEntity().setScale(10);
+        skyBox.getSkyBoxEntity().updateModelMatrix();
         scene.setSkybox(skyBox);
 
         scene.getCamera().moveUp(0.1f);
@@ -179,7 +180,7 @@ public class Main implements GameLogicInterface {
 //        mageEntity.setRotation(1, 1, 1, 60);
         mageEntity.updateModelMatrix();
 
-        camera.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y + 0.5f, mageEntity.getPosition().z - 0.5f);
+        camera.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y + 5f, mageEntity.getPosition().z - 5f);
 
 
         int cellSize = 10;
