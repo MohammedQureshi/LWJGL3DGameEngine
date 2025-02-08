@@ -5,9 +5,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.mqureshi.client.HandleClient;
 import org.mqureshi.control.MouseInput;
-import org.mqureshi.engine.light.LightControls;
-import org.mqureshi.engine.light.point.PointLight;
-import org.mqureshi.engine.light.spot.SpotLight;
 import org.mqureshi.engine.model.ModelLoader;
 import org.mqureshi.engine.interfaces.GameLogicInterface;
 import org.mqureshi.engine.skybox.Skybox;
@@ -15,6 +12,7 @@ import org.mqureshi.engine.util.Engine;
 import org.mqureshi.engine.util.Render;
 import org.mqureshi.engine.util.Window;
 import org.mqureshi.entities.*;
+import org.mqureshi.fog.Fog;
 import org.mqureshi.scenes.Scene;
 import org.mqureshi.scenes.SceneLights;
 
@@ -26,7 +24,7 @@ public class Main implements GameLogicInterface {
 
     private static final float MOUSE_SENSITIVITY = 0.1f;
     private static final float MOVEMENT_SPEED = 0.001f;
-    private static final int NUM_CHUNKS = 4;
+    private static final int NUM_CHUNKS = 1;
     private Entity[][] terrainEntities;
 
     private Channel udpChannel;
@@ -63,6 +61,14 @@ public class Main implements GameLogicInterface {
                 scene.getTextureCache());
         scene.addModel(quadModel);
 
+//        int numRows = 1;
+//        int numCols = numRows;
+//        terrainEntities = new Entity[numRows][numCols];
+//        Entity entity = new Entity("TERRAIN_" + "0" + "_" + "0", quadModelId);
+//        terrainEntities[0][0] = entity;
+//        entity.getModelMatrix().identity().scale(0.25f).translate(entity.getPosition());
+//        scene.addEntity(entity);
+
         int numRows = NUM_CHUNKS * 2 + 1;
         int numCols = numRows;
         terrainEntities = new Entity[numRows][numCols];
@@ -92,6 +98,8 @@ public class Main implements GameLogicInterface {
         scene.setSkybox(skyBox);
 
         scene.getCamera().moveUp(0.1f);
+
+        scene.setFog(new Fog(true, new Vector3f(0.5f, 0.5f, 0.5f), 0.50f));
 
         updateTerrain(scene);
 //        sceneLights.getPointLights().add(new PointLight(new Vector3f(1, 1, 1),
@@ -180,7 +188,7 @@ public class Main implements GameLogicInterface {
 //        mageEntity.setRotation(1, 1, 1, 60);
         mageEntity.updateModelMatrix();
 
-        camera.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y + 5f, mageEntity.getPosition().z - 5f);
+//        camera.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y + 5f, mageEntity.getPosition().z - 5f);
 
 
         int cellSize = 10;

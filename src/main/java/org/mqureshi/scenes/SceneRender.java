@@ -16,6 +16,7 @@ import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Material;
 import org.mqureshi.entities.Mesh;
 import org.mqureshi.entities.Model;
+import org.mqureshi.fog.Fog;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,8 @@ import java.util.List;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL14.GL_FUNC_ADD;
+import static org.lwjgl.opengl.GL14.glBlendEquation;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -48,11 +51,19 @@ public class SceneRender {
     }
 
     public void render(Scene scene) {
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         shaderProgram.bind();
 
         uniformsMap.setUniform("projectionMatrix", scene.getProjection().getProjectionMatrix());
         uniformsMap.setUniform("viewMatrix", scene.getCamera().getViewMatrix());
         uniformsMap.setUniform("txtSampler", 0);
+
+        Fog fog = scene.getFog();
+        uniformsMap.setUniform("fog.activeFog", fog.isActive() ? 1 : 0);
+        uniformsMap.setUniform("fog.color", fog.getColor());
+        uniformsMap.setUniform("fog.density", fog.getDensity());
 
         updateLights(scene);
 
@@ -82,6 +93,7 @@ public class SceneRender {
 
         glBindVertexArray(0);
         shaderProgram.unbind();
+        glDisable(GL_BLEND);
     }
 
     private void createUniforms() {
@@ -96,6 +108,9 @@ public class SceneRender {
         uniformsMap.createUniform("material.reflectance");
         uniformsMap.createUniform("ambientLight.factor");
         uniformsMap.createUniform("ambientLight.color");
+        uniformsMap.createUniform("fog.activeFog");
+        uniformsMap.createUniform("fog.color");
+        uniformsMap.createUniform("fog.density");
 
         for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
             String name = "pointLights[" + i + "]";

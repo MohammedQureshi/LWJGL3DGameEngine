@@ -6,6 +6,7 @@ import org.mqureshi.engine.texture.TextureCache;
 import org.mqureshi.entities.Camera;
 import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Model;
+import org.mqureshi.fog.Fog;
 import org.mqureshi.gui.IGuiInstance;
 
 import java.util.HashMap;
@@ -20,12 +21,14 @@ public class Scene {
     private IGuiInstance guiInstance;
     private SceneLights sceneLights;
     private Skybox skybox;
+    private Fog fog;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
         projection = new Projection(width, height);
         textureCache = new TextureCache();
         camera = new Camera();
+        fog = new Fog();
     }
 
     public Camera getCamera() {
@@ -87,6 +90,14 @@ public class Scene {
 
     public void setSkybox(Skybox skybox) {
         this.skybox = skybox;
+    }
+
+    public Fog getFog() {
+        return fog;
+    }
+
+    public void setFog(Fog fog) {
+        this.fog = fog;
     }
 
 }
