@@ -5,6 +5,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.mqureshi.client.HandleClient;
 import org.mqureshi.control.MouseInput;
+import org.mqureshi.engine.light.LightControls;
 import org.mqureshi.engine.model.ModelLoader;
 import org.mqureshi.engine.interfaces.GameLogicInterface;
 import org.mqureshi.engine.skybox.Skybox;
@@ -13,6 +14,7 @@ import org.mqureshi.engine.util.Render;
 import org.mqureshi.engine.util.Window;
 import org.mqureshi.entities.*;
 import org.mqureshi.fog.Fog;
+import org.mqureshi.fog.FogControls;
 import org.mqureshi.scenes.Scene;
 import org.mqureshi.scenes.SceneLights;
 
@@ -99,7 +101,8 @@ public class Main implements GameLogicInterface {
 
         scene.getCamera().moveUp(0.1f);
 
-        scene.setFog(new Fog(true, new Vector3f(0.5f, 0.5f, 0.5f), 0.50f));
+        scene.setFog(new Fog(true, new Vector3f(0.352f, 0.401f, 0.466f), 0.50f));
+        scene.setGuiInstance(new FogControls(scene));
 
         updateTerrain(scene);
 //        sceneLights.getPointLights().add(new PointLight(new Vector3f(1, 1, 1),
