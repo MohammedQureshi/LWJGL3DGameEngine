@@ -1,4 +1,4 @@
-package org.mqureshi.gui;
+package org.mqureshi.engine.gui;
 
 import org.mqureshi.engine.util.Window;
 import org.mqureshi.scenes.Scene;

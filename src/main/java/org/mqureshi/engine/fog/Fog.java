@@ -1,4 +1,4 @@
-package org.mqureshi.fog;
+package org.mqureshi.engine.fog;
 
 import org.joml.Vector3f;
 

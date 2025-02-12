@@ -6,8 +6,8 @@ import org.mqureshi.engine.texture.TextureCache;
 import org.mqureshi.entities.Camera;
 import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Model;
-import org.mqureshi.fog.Fog;
-import org.mqureshi.gui.IGuiInstance;
+import org.mqureshi.engine.fog.Fog;
+import org.mqureshi.engine.gui.IGuiInstance;
 
 import java.util.HashMap;
 import java.util.Map;

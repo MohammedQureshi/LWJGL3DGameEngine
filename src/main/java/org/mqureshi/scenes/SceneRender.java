@@ -16,7 +16,7 @@ import org.mqureshi.entities.Entity;
 import org.mqureshi.entities.Material;
 import org.mqureshi.entities.Mesh;
 import org.mqureshi.entities.Model;
-import org.mqureshi.fog.Fog;
+import org.mqureshi.engine.fog.Fog;
 
 import java.util.ArrayList;
 import java.util.Collection;

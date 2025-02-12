@@ -5,7 +5,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.mqureshi.client.HandleClient;
 import org.mqureshi.control.MouseInput;
-import org.mqureshi.engine.light.LightControls;
 import org.mqureshi.engine.model.ModelLoader;
 import org.mqureshi.engine.interfaces.GameLogicInterface;
 import org.mqureshi.engine.skybox.Skybox;
@@ -13,8 +12,9 @@ import org.mqureshi.engine.util.Engine;
 import org.mqureshi.engine.util.Render;
 import org.mqureshi.engine.util.Window;
 import org.mqureshi.entities.*;
-import org.mqureshi.fog.Fog;
-import org.mqureshi.fog.FogControls;
+import org.mqureshi.engine.fog.Fog;
+import org.mqureshi.engine.fog.FogControls;
+import org.mqureshi.player.Player;
 import org.mqureshi.scenes.Scene;
 import org.mqureshi.scenes.SceneLights;
 
@@ -33,6 +33,7 @@ public class Main implements GameLogicInterface {
     private InetSocketAddress serverAddress = new InetSocketAddress("localhost", 8080);
     private HandleClient handleClient;
     private boolean isMouseCaptured = false;
+    private Player player;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -85,10 +86,15 @@ public class Main implements GameLogicInterface {
         Model mageModel = ModelLoader.loadModel("mage-model", "assets/mage/mage.obj",
                 scene.getTextureCache());
         scene.addModel(mageModel);
-        Entity mageModelEntity = new Entity("mage-model","mage-model");
-        mageModelEntity.setScale(0.1f);
-        mageModelEntity.updateModelMatrix();
-        scene.addEntity(mageModelEntity);
+//        Entity mageModelEntity = new Entity("mage-model","mage-model");
+//        mageModelEntity.setScale(0.1f);
+//        mageModelEntity.updateModelMatrix();
+//        scene.addEntity(mageModelEntity);
+
+        player = new Player("player1", "mage-model", udpChannel, serverAddress);
+        player.setScale(0.1f);
+        player.updateModelMatrix();
+        scene.addEntity(player);
 
         SceneLights sceneLights = new SceneLights();
         sceneLights.getAmbientLight().setIntensity(0.3f);
@@ -119,50 +125,74 @@ public class Main implements GameLogicInterface {
     @Override
     public void input(Window window, Scene scene, long diffTimeMillis, boolean inputConsumed) {
         if (inputConsumed) return;
-
-        Entity mageEntity = scene.getModelMap().get("mage-model").getEntityList().getFirst();
-
-        float move = diffTimeMillis * MOVEMENT_SPEED;
         Camera camera = scene.getCamera();
-        if (window.isKeyPressed(GLFW_KEY_W)) {
-            mageEntity.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y, mageEntity.getPosition().z + move);
-        } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            mageEntity.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y, mageEntity.getPosition().z - move);
-        }
-        if (window.isKeyPressed(GLFW_KEY_A)) {
-            mageEntity.setPosition(mageEntity.getPosition().x + move, mageEntity.getPosition().y, mageEntity.getPosition().z);
-        } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            mageEntity.setPosition(mageEntity.getPosition().x - move, mageEntity.getPosition().y, mageEntity.getPosition().z);
-        }
-        if (window.isKeyPressed(GLFW_KEY_SPACE)) {
-            camera.moveUp(move);
-        } else if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-            camera.moveDown(move);
-        }
+        // Handle player movement
+        player.handleInput(window, diffTimeMillis);
 
+        // Get mouse movement
         MouseInput mouseInput = window.getMouseInput();
-        if (mouseInput.isLeftButtonPressedOnce()) {
-            toggleMouseCapture(window);
-        }
+        Vector2f displVec = mouseInput.getDisplayVector();
 
-        if (isMouseCaptured) {
-            Vector2f displVec = mouseInput.getDisplayVector();
-            float rotationX = (float) Math.toRadians(displVec.y * MOUSE_SENSITIVITY);
-            float rotationY = (float) Math.toRadians(displVec.x * MOUSE_SENSITIVITY);
+        // Rotate camera around the player
+        float rotationSpeed = 0.002f;
+        float angleX = camera.getRotation().x - displVec.y * rotationSpeed;
+        float angleY = camera.getRotation().y - displVec.x * rotationSpeed;
 
-            // Optional: Clamp vertical rotation to avoid camera flipping
-            camera.addRotation(rotationY, rotationX);
-//            camera.followPlayer(mageEntity.getPosition(), 1f, 1f, 1f);
-        }
+        // Prevent camera flipping (clamp X rotation)
+        angleX = Math.max((float) Math.toRadians(-89), Math.min((float) Math.toRadians(89), angleX));
 
-//        if (udpChannel != null) {
-//            String message = String.format("Position: %.2f, %.2f, %.2f", entityPos.x, entityPos.y, entityPos.z);
-//            udpChannel.writeAndFlush(new DatagramPacket(
-//                    Unpooled.copiedBuffer(message, CharsetUtil.UTF_8),
-//                    serverAddress
-//            ));
-//        }
+        // Make the camera follow the player with rotation
+        camera.followPlayer(player.getPosition(), 1.0f, angleX, angleY);
     }
+
+
+//    @Override
+//    public void input(Window window, Scene scene, long diffTimeMillis, boolean inputConsumed) {
+//        if (inputConsumed) return;
+//
+//        Entity mageEntity = scene.getModelMap().get("mage-model").getEntityList().getFirst();
+//
+//        float move = diffTimeMillis * MOVEMENT_SPEED;
+//        Camera camera = scene.getCamera();
+//        if (window.isKeyPressed(GLFW_KEY_W)) {
+//            mageEntity.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y, mageEntity.getPosition().z + move);
+//        } else if (window.isKeyPressed(GLFW_KEY_S)) {
+//            mageEntity.setPosition(mageEntity.getPosition().x, mageEntity.getPosition().y, mageEntity.getPosition().z - move);
+//        }
+//        if (window.isKeyPressed(GLFW_KEY_A)) {
+//            mageEntity.setPosition(mageEntity.getPosition().x + move, mageEntity.getPosition().y, mageEntity.getPosition().z);
+//        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+//            mageEntity.setPosition(mageEntity.getPosition().x - move, mageEntity.getPosition().y, mageEntity.getPosition().z);
+//        }
+//        if (window.isKeyPressed(GLFW_KEY_SPACE)) {
+//            camera.moveUp(move);
+//        } else if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+//            camera.moveDown(move);
+//        }
+//
+//        MouseInput mouseInput = window.getMouseInput();
+//        if (mouseInput.isLeftButtonPressedOnce()) {
+//            toggleMouseCapture(window);
+//        }
+//
+//        if (isMouseCaptured) {
+//            Vector2f displVec = mouseInput.getDisplayVector();
+//            float rotationX = (float) Math.toRadians(displVec.y * MOUSE_SENSITIVITY);
+//            float rotationY = (float) Math.toRadians(displVec.x * MOUSE_SENSITIVITY);
+//
+//            // Optional: Clamp vertical rotation to avoid camera flipping
+//            camera.addRotation(rotationY, rotationX);
+////            camera.followPlayer(mageEntity.getPosition(), 1f, 1f, 1f);
+//        }
+//
+////        if (udpChannel != null) {
+////            String message = String.format("Position: %.2f, %.2f, %.2f", entityPos.x, entityPos.y, entityPos.z);
+////            udpChannel.writeAndFlush(new DatagramPacket(
+////                    Unpooled.copiedBuffer(message, CharsetUtil.UTF_8),
+////                    serverAddress
+////            ));
+////        }
+//    }
 
     private void toggleMouseCapture(Window window) {
         isMouseCaptured = !isMouseCaptured;

@@ -1,7 +1,7 @@
 package org.mqureshi.engine.util;
 
 import org.mqureshi.engine.skybox.SkyboxRender;
-import org.mqureshi.gui.GuiRender;
+import org.mqureshi.engine.gui.GuiRender;
 import org.mqureshi.scenes.Scene;
 import org.mqureshi.scenes.SceneRender;
 

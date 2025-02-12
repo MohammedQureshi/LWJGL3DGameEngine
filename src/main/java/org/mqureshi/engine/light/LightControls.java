@@ -11,7 +11,7 @@ import org.mqureshi.engine.light.directional.DirectionalLight;
 import org.mqureshi.engine.light.point.PointLight;
 import org.mqureshi.engine.light.spot.SpotLight;
 import org.mqureshi.engine.util.Window;
-import org.mqureshi.gui.IGuiInstance;
+import org.mqureshi.engine.gui.IGuiInstance;
 import org.mqureshi.scenes.Scene;
 import org.mqureshi.scenes.SceneLights;
 

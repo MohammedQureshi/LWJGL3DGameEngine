@@ -72,11 +72,21 @@ public class Camera {
     }
 
     private void recalculate() {
-        viewMatrix.identity()
-                .rotateX(rotation.x)
-                .rotateY(rotation.y)
-                .translate(-position.x, -position.y, -position.z);
+        // Update direction vector based on rotation
+        direction.set(
+                (float) (Math.cos(rotation.y) * Math.cos(rotation.x)),
+                (float) Math.sin(rotation.x),
+                (float) (Math.sin(rotation.y) * Math.cos(rotation.x))
+        ).normalize();
+
+        // Use LookAt to ensure the camera faces the correct direction
+        viewMatrix.identity().lookAt(
+                position,
+                new Vector3f(position).add(direction),
+                new Vector3f(0, 1, 0) // Up direction
+        );
     }
+
 
     public void setPosition(float x, float y, float z) {
         position.set(x, y, z);
@@ -101,19 +111,19 @@ public class Camera {
      * @param angleY         The rotation angle around the Y-axis (horizontal).
      */
     public void followPlayer(Vector3f playerPosition, float distance, float angleX, float angleY) {
-        // Update rotation for the camera based on input angles
+        // Update rotation angles
         rotation.set(angleX, angleY);
 
-        // Calculate the camera's position around the player using spherical coordinates
-        float x = playerPosition.x + (float) (distance * Math.sin(angleY) * Math.cos(angleX));
-        float y = playerPosition.y + (float) (distance * Math.sin(angleX));
-        float z = playerPosition.z + (float) (distance * Math.cos(angleY) * Math.cos(angleX));
+        // Convert spherical coordinates to cartesian coordinates
+        float offsetX = (float) (distance * Math.sin(angleY) * Math.cos(angleX));
+        float offsetY = (float) (distance * Math.sin(angleX));
+        float offsetZ = (float) (distance * Math.cos(angleY) * Math.cos(angleX));
 
-        // Set the camera's position
-        position.set(x, y, z);
+        // Set camera position relative to the player
+        position.set(playerPosition.x - offsetX, playerPosition.y + offsetY, playerPosition.z - offsetZ);
 
-        // Ensure the camera looks at the player
-        viewMatrix.identity()
-                .lookAt(position, playerPosition, new Vector3f(0, 1, 0)); // Up vector (0, 1, 0)
+        // Make sure the camera is looking at the player
+        recalculate();
     }
+
 }

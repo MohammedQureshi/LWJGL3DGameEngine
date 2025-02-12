@@ -1,4 +1,4 @@
-package org.mqureshi.gui;
+package org.mqureshi.engine.gui;
 
 import imgui.ImDrawData;
 import imgui.ImFontAtlas;

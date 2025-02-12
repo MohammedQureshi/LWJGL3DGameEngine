@@ -1,4 +1,4 @@
-package org.mqureshi.fog;
+package org.mqureshi.engine.fog;
 
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -7,7 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.mqureshi.control.MouseInput;
 import org.mqureshi.engine.util.Window;
-import org.mqureshi.gui.IGuiInstance;
+import org.mqureshi.engine.gui.IGuiInstance;
 import org.mqureshi.scenes.Scene;
 
 public class FogControls implements IGuiInstance {
