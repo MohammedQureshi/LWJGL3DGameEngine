@@ -24,14 +24,14 @@ public class Player extends Entity {
         Vector3f position = getPosition();
 
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            position.z -= moveAmount;
-        } else if (window.isKeyPressed(GLFW_KEY_S)) {
             position.z += moveAmount;
+        } else if (window.isKeyPressed(GLFW_KEY_S)) {
+            position.z -= moveAmount;
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            position.x -= moveAmount;
-        } else if (window.isKeyPressed(GLFW_KEY_D)) {
             position.x += moveAmount;
+        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            position.x -= moveAmount;
         }
         if (window.isKeyPressed(GLFW_KEY_SPACE)) {
             position.y += moveAmount;

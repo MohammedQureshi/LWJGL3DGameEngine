@@ -107,7 +107,7 @@ public class Main implements GameLogicInterface {
 
         scene.getCamera().moveUp(0.1f);
 
-        scene.setFog(new Fog(true, new Vector3f(0.352f, 0.401f, 0.466f), 0.50f));
+        scene.setFog(new Fog(true, new Vector3f(0.352f, 0.401f, 0.466f), 0.25f));
         scene.setGuiInstance(new FogControls(scene));
 
         updateTerrain(scene);
@@ -125,25 +125,28 @@ public class Main implements GameLogicInterface {
     @Override
     public void input(Window window, Scene scene, long diffTimeMillis, boolean inputConsumed) {
         if (inputConsumed) return;
-        Camera camera = scene.getCamera();
-        // Handle player movement
-        player.handleInput(window, diffTimeMillis);
 
-        // Get mouse movement
+        Camera camera = scene.getCamera();
         MouseInput mouseInput = window.getMouseInput();
         Vector2f displVec = mouseInput.getDisplayVector();
-
-        // Rotate camera around the player
+        if (player != null) {
+            player.handleInput(window, diffTimeMillis);
+        }
+        // Camera orbit settings
         float rotationSpeed = 0.002f;
-        float angleX = camera.getRotation().x - displVec.y * rotationSpeed;
-        float angleY = camera.getRotation().y - displVec.x * rotationSpeed;
+        float distance = 1.0f; // Distance from player
+
+        // Update angles based on mouse movement
+        float angleX = camera.getRotation().x - displVec.x * rotationSpeed;
+        float angleY = camera.getRotation().y - displVec.y * rotationSpeed;
 
         // Prevent camera flipping (clamp X rotation)
         angleX = Math.max((float) Math.toRadians(-89), Math.min((float) Math.toRadians(89), angleX));
 
-        // Make the camera follow the player with rotation
-        camera.followPlayer(player.getPosition(), 1.0f, angleX, angleY);
+        // Update camera position to orbit around the player
+        camera.followPlayer(player.getPosition(), distance, angleX, angleY);
     }
+
 
 
 //    @Override

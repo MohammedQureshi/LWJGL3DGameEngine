@@ -111,19 +111,24 @@ public class Camera {
      * @param angleY         The rotation angle around the Y-axis (horizontal).
      */
     public void followPlayer(Vector3f playerPosition, float distance, float angleX, float angleY) {
-        // Update rotation angles
-        rotation.set(angleX, angleY);
+        // Prevent flipping by clamping vertical rotation
+        angleX = Math.max((float) Math.toRadians(-89), Math.min((float) Math.toRadians(89), angleX));
 
         // Convert spherical coordinates to cartesian coordinates
-        float offsetX = (float) (distance * Math.sin(angleY) * Math.cos(angleX));
+        float horizontalDistance = (float) (distance * Math.cos(angleX));
+        float offsetX = (float) (horizontalDistance * Math.sin(angleY));
+        float offsetZ = (float) (horizontalDistance * Math.cos(angleY));
         float offsetY = (float) (distance * Math.sin(angleX));
-        float offsetZ = (float) (distance * Math.cos(angleY) * Math.cos(angleX));
 
-        // Set camera position relative to the player
+        // Set the new camera position relative to the player
         position.set(playerPosition.x - offsetX, playerPosition.y + offsetY, playerPosition.z - offsetZ);
 
-        // Make sure the camera is looking at the player
-        recalculate();
+        // Update rotation values
+        rotation.set(angleX, angleY);
+
+        // Ensure the camera looks at the player
+        viewMatrix.identity().lookAt(position, playerPosition, new Vector3f(0, 1, 0));
     }
+
 
 }
