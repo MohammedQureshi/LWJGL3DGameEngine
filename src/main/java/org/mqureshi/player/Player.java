@@ -1,5 +1,6 @@
 package org.mqureshi.player;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.mqureshi.engine.util.Window;
 import static org.lwjgl.glfw.GLFW.*;
@@ -21,17 +22,15 @@ public class Player extends Entity {
 
     public void handleInput(Window window, long deltaTime) {
         float moveAmount = deltaTime * SPEED;
+        float turnSpeed = 0.005f * deltaTime;
+
         Vector3f position = getPosition();
+        Quaternionf rotation = getRotation(); // Player's rotation
 
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            position.z += moveAmount;
+            position.add(new Vector3f(0, 0, moveAmount).rotate(rotation));
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            position.z -= moveAmount;
-        }
-        if (window.isKeyPressed(GLFW_KEY_A)) {
-            position.x += moveAmount;
-        } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            position.x -= moveAmount;
+            position.add(new Vector3f(0, 0, -moveAmount).rotate(rotation));
         }
         if (window.isKeyPressed(GLFW_KEY_SPACE)) {
             position.y += moveAmount;
@@ -39,7 +38,15 @@ public class Player extends Entity {
             position.y -= moveAmount;
         }
 
+        // Rotation
+        if (window.isKeyPressed(GLFW_KEY_A)) {
+            rotation.rotateY(turnSpeed);
+        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            rotation.rotateY(-turnSpeed);
+        }
+
         setPosition(position.x, position.y, position.z);
+
         updateModelMatrix();
         sendPositionUpdate();
     }
