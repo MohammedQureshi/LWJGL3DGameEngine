@@ -126,25 +126,16 @@ public class Main implements GameLogicInterface {
     public void input(Window window, Scene scene, long diffTimeMillis, boolean inputConsumed) {
         if (inputConsumed) return;
 
-        Camera camera = scene.getCamera();
         MouseInput mouseInput = window.getMouseInput();
-        Vector2f displVec = mouseInput.getDisplayVector();
+        Camera camera = scene.getCamera();
+
         if (player != null) {
-            player.handleInput(window, diffTimeMillis);
+            player.handleInput(window, mouseInput, diffTimeMillis, camera);
         }
-        // Camera orbit settings
-        float rotationSpeed = 0.002f;
-        float distance = 1.0f; // Distance from player
 
-        // Update angles based on mouse movement
-        float angleX = camera.getRotation().x - displVec.x * rotationSpeed;
-        float angleY = camera.getRotation().y - displVec.y * rotationSpeed;
-
-        // Prevent camera flipping (clamp X rotation)
-        angleX = Math.max((float) Math.toRadians(-89), Math.min((float) Math.toRadians(89), angleX));
-
-        // Update camera position to orbit around the player
-        camera.followPlayer(player.getPosition(), distance, angleX, angleY);
+        if (mouseInput.isLeftButtonPressedOnce()) {
+            toggleMouseCapture(window);
+        }
     }
 
 

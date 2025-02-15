@@ -12,6 +12,7 @@ public class Camera {
     private final Vector3f up;
     private final Vector2f rotation;
     private final Matrix4f viewMatrix;
+    private static final float HEIGHT_OFFSET = 0.75f;
 
     public Camera() {
         direction = new Vector3f();
@@ -114,11 +115,11 @@ public class Camera {
         // Prevent flipping by clamping vertical rotation
         angleX = Math.max((float) Math.toRadians(-89), Math.min((float) Math.toRadians(89), angleX));
 
-        // Convert spherical coordinates to cartesian coordinates
+        // Convert spherical coordinates to Cartesian coordinates
         float horizontalDistance = (float) (distance * Math.cos(angleX));
         float offsetX = (float) (horizontalDistance * Math.sin(angleY));
         float offsetZ = (float) (horizontalDistance * Math.cos(angleY));
-        float offsetY = (float) (distance * Math.sin(angleX));
+        float offsetY = (float) (distance * Math.sin(angleX)) + HEIGHT_OFFSET; // Apply height offset correctly
 
         // Set the new camera position relative to the player
         position.set(playerPosition.x - offsetX, playerPosition.y + offsetY, playerPosition.z - offsetZ);
@@ -127,8 +128,9 @@ public class Camera {
         rotation.set(angleX, angleY);
 
         // Ensure the camera looks at the player
-        viewMatrix.identity().lookAt(position, playerPosition, new Vector3f(0, 1, 0));
+        viewMatrix.identity().lookAt(position, playerPosition.add(0, HEIGHT_OFFSET, 0, new Vector3f()), new Vector3f(0, 1, 0));
     }
+
 
 
 }

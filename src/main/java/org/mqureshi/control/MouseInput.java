@@ -75,10 +75,10 @@ public class MouseInput {
             boolean rotateX = deltaX != 0;
             boolean rotateY = deltaY != 0;
             if (rotateX) {
-                displayVector.y = (float) deltaX;
+                displayVector.x = (float) deltaX; // Correct: X movement affects X
             }
             if (rotateY) {
-                displayVector.x = (float) deltaY;
+                displayVector.y = (float) deltaY; // Correct: Y movement affects Y
             }
         }
         previousPosition.x = currentPosition.x;
