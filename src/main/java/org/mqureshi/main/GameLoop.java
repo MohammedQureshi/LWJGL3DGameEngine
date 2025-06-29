@@ -4,6 +4,7 @@ import org.mqureshi.renderEngine.DisplayManager;
 import org.mqureshi.renderEngine.Loader;
 import org.mqureshi.renderEngine.RawModel;
 import org.mqureshi.renderEngine.Renderer;
+import org.mqureshi.shaders.StaticShader;
 
 public class GameLoop {
 
@@ -13,6 +14,7 @@ public class GameLoop {
 
         Loader loader = new Loader();
         Renderer renderer = new Renderer();
+        StaticShader shader = new StaticShader();
 
         // Triangle in vertices
         float[] vertices = new float[]{
@@ -31,10 +33,13 @@ public class GameLoop {
 
         while (!displayManager.isCloseRequested()) {
             renderer.prepare();
+            shader.start();
             renderer.render(model);
+            shader.stop();
             displayManager.updateDisplay();
         }
 
+        shader.cleanUp();
         loader.cleanUp();
         displayManager.cleanup();
     }
