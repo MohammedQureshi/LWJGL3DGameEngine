@@ -8,7 +8,7 @@ plugins {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'org.mqureshi.Main'
+                'Main-Class': 'org.mqureshi.main.GameLoop'
         )
     }
 }

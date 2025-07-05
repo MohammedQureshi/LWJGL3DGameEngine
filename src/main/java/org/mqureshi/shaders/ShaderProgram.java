@@ -11,9 +11,9 @@ import java.nio.charset.StandardCharsets;
 
 public abstract class ShaderProgram {
 
-    private int programId;
-    private int vertexShaderId;
-    private int fragmentShaderId;
+    private final int programId;
+    private final int vertexShaderId;
+    private final int fragmentShaderId;
 
     public ShaderProgram(String vertexFile, String fragmentFile) {
         vertexShaderId = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
