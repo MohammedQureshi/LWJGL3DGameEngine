@@ -1,9 +1,9 @@
-package org.mqureshi.renderEngine;
+package org.mqureshi.models;
 
 public class RawModel {
 
-    private int vaoID;
-    private int vertexCount;
+    private final int vaoID;
+    private final int vertexCount;
 
     public RawModel(int vaoId, int vertexCount) {
         this.vaoID = vaoId;
