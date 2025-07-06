@@ -10,6 +10,7 @@ import org.mqureshi.entities.Entity;
 import org.mqureshi.models.RawModel;
 import org.mqureshi.models.TexturedModel;
 import org.mqureshi.shaders.StaticShader;
+import org.mqureshi.textures.ModelTexture;
 import org.mqureshi.toolbox.Maths;
 
 public class Renderer {
@@ -43,6 +44,8 @@ public class Renderer {
         GL20.glEnableVertexAttribArray(2);
 
         Matrix4f transformationMatrix = Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
+        ModelTexture texture = model.getModelTexture();
+        shader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
         shader.loadTransformationMatrix(transformationMatrix);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);

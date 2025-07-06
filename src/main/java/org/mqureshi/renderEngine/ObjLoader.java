@@ -18,7 +18,7 @@ public class ObjLoader {
 
     public static RawModel loadObjModel(String resourcePath, Loader loader) {
 
-        ByteBuffer fileBuffer = Utils.ioResourceToByteBuffer(resourcePath, 8 * 1024);
+        ByteBuffer fileBuffer = Utils.ioResourceToByteBuffer("/" + resourcePath, 8 * 1024);
 
         AIScene scene = aiImportFileFromMemory(fileBuffer,
                 aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_FlipUVs,
