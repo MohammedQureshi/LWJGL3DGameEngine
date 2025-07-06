@@ -32,6 +32,7 @@ public class ObjLoader {
 
         List<Float> vertices = new ArrayList<>();
         List<Float> textures = new ArrayList<>();
+        List<Float> normals = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
 
         for (int i = 0; i < mesh.mNumVertices(); i++) {
@@ -48,6 +49,11 @@ public class ObjLoader {
                 textures.add(0.0f);
                 textures.add(0.0f);
             }
+
+            AIVector3D normal = mesh.mNormals().get(i);
+            normals.add(normal.x());
+            normals.add(normal.y());
+            normals.add(normal.z());
         }
 
         for (int i = 0; i < mesh.mNumFaces(); i++) {
@@ -67,8 +73,15 @@ public class ObjLoader {
         for (int i = 0; i < textures.size(); i++) {
             texturesArray[i] = textures.get(i);
         }
+
+        float[] normalsArray = new float[normals.size()];
+        for (int i = 0; i < normals.size(); i++) {
+            normalsArray[i] = normals.get(i);
+        }
+
         int[] indicesArray = indices.stream().mapToInt(i -> i).toArray();
 
-        return loader.loadToVao(verticesArray, texturesArray, indicesArray);
+        return loader.loadToVao(verticesArray, texturesArray, normalsArray, indicesArray);
     }
+
 }
