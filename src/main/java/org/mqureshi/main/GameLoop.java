@@ -23,14 +23,13 @@ public class GameLoop {
 
         RawModel model = ObjLoader.loadObjModel("assets/tree/tree.obj", loader);
         ModelTexture texture = new ModelTexture(loader.loadTexture("assets/tree/tree.png"));
-        TexturedModel staticModel  = new TexturedModel(model, texture);
+        TexturedModel staticModel = new TexturedModel(model, texture);
 
         List<Entity> entities = new ArrayList<>();
         Random random = new Random();
-        for(int i=0;i<500;i++){
-            entities.add(new Entity(staticModel, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,3));
+        for (int i = 0; i < 500; i++) {
+            entities.add(new Entity(staticModel, new Vector3f(random.nextFloat() * 800 - 400, 0, random.nextFloat() * -600), 0, 0, 0, 3));
         }
-
 
         Light light = new Light(new Vector3f(3000, 2000, 20), new Vector3f(1, 1, 1));
 
@@ -46,7 +45,7 @@ public class GameLoop {
             renderer.processTerrain(terrain);
             renderer.processTerrain(terrain2);
 
-            for(Entity entity:entities){
+            for (Entity entity : entities) {
                 renderer.processEntity(entity);
             }
             renderer.render(light, camera);
