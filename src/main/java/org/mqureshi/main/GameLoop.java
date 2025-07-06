@@ -1,5 +1,7 @@
 package org.mqureshi.main;
 
+import org.joml.Vector3f;
+import org.mqureshi.entities.Entity;
 import org.mqureshi.models.TexturedModel;
 import org.mqureshi.renderEngine.DisplayManager;
 import org.mqureshi.renderEngine.Loader;
@@ -41,11 +43,12 @@ public class GameLoop {
         RawModel model = loader.loadToVao(vertices, textureCoords, indices);
         ModelTexture texture = new ModelTexture(loader.loadTexture("textures/image.png"));
         TexturedModel texturedModel = new TexturedModel(model, texture);
+        Entity entity = new Entity(texturedModel, new Vector3f(-1, 0, 0), 0, 0, 0, 1);
 
         while (!displayManager.isCloseRequested()) {
             renderer.prepare();
             shader.start();
-            renderer.render(texturedModel);
+            renderer.render(entity, shader);
             shader.stop();
             displayManager.updateDisplay();
         }
