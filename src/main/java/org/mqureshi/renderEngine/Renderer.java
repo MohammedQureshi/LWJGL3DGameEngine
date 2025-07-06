@@ -1,6 +1,7 @@
 package org.mqureshi.renderEngine;
 
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -13,7 +14,21 @@ import org.mqureshi.toolbox.Maths;
 
 public class Renderer {
 
+    private static final float FOV = 70;
+    private static final float NEAR_PLANE = 0.1f;
+    private static final float FAR_PLANE = 1000;
+
+    private Matrix4f projectionMatrix;
+
+    public Renderer(DisplayManager displayManager, StaticShader shader) {
+        createProjectionMatrix(displayManager);
+        shader.start();
+        shader.loadProjectionMatrix(projectionMatrix);
+        shader.stop();
+    }
+
     public void prepare() {
+        GL11.glEnable(GL11.GL_DEPTH_TEST | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(0, 0, 1, 1);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
@@ -37,6 +52,21 @@ public class Renderer {
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
         GL30.glBindVertexArray(0);
+    }
+
+    private void createProjectionMatrix(DisplayManager displayManager) {
+        int[] width = new int[1];
+        int[] height = new int[1];
+        GLFW.glfwGetWindowSize(displayManager.getWindowHandle(), width, height);
+
+        float aspectRatio = (float) width[0] / (float) height[0];
+
+        projectionMatrix = new Matrix4f().setPerspective(
+                (float) Math.toRadians(FOV),
+                aspectRatio,
+                NEAR_PLANE,
+                FAR_PLANE
+        );
     }
 
 }
