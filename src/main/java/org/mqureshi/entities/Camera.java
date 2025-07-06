@@ -5,13 +5,13 @@ import org.lwjgl.glfw.GLFW;
 
 public class Camera {
 
-    private final Vector3f position = new Vector3f(0, 0, 0);
-    private float pitch;
+    private final Vector3f position = new Vector3f(0, 5, 0);
+    private float pitch = 10;
     private float yaw;
     private float roll;
     private final long windowHandle;
 
-    private final float moveSpeed = 0.05f;
+    private final float moveSpeed = 0.1f;
 
     public Camera(long windowHandle) {
         this.windowHandle = windowHandle;

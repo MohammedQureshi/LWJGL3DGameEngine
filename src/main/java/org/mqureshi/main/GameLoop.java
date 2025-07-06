@@ -8,6 +8,7 @@ import org.mqureshi.entities.Light;
 import org.mqureshi.models.TexturedModel;
 import org.mqureshi.renderEngine.*;
 import org.mqureshi.models.RawModel;
+import org.mqureshi.terrains.Terrain;
 import org.mqureshi.textures.ModelTexture;
 
 import java.util.ArrayList;
@@ -20,28 +21,33 @@ public class GameLoop {
         displayManager.createDisplay();
         Loader loader = new Loader();
 
-        RawModel model = ObjLoader.loadObjModel("assets/box/box.obj", loader);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("textures/image.png"));
-        TexturedModel texturedModel = new TexturedModel(model, texture);
-        Light light = new Light(new Vector3f(3000, 2000, 20), new Vector3f(1, 1, 1));
-        Camera camera = new Camera(displayManager.getWindowHandle());
+        RawModel model = ObjLoader.loadObjModel("assets/tree/tree.obj", loader);
+        ModelTexture texture = new ModelTexture(loader.loadTexture("assets/tree/tree.png"));
+        TexturedModel staticModel  = new TexturedModel(model, texture);
 
-        List<Entity> allCubes = new ArrayList<>();
+        List<Entity> entities = new ArrayList<>();
         Random random = new Random();
-
-        for (int i = 0; i < 200; i++) {
-            float x = random.nextFloat() * 100 - 50;
-            float y = random.nextFloat() * 100 - 50;
-            float z = random.nextFloat() * -300;
-            allCubes.add(new Entity(texturedModel, new Vector3f(x, y, z), random.nextFloat() * 180f, random.nextFloat() * 180f, 0f, 1f));
+        for(int i=0;i<500;i++){
+            entities.add(new Entity(staticModel, new Vector3f(random.nextFloat()*800 - 400,0,random.nextFloat() * -600),0,0,0,3));
         }
 
+
+        Light light = new Light(new Vector3f(3000, 2000, 20), new Vector3f(1, 1, 1));
+
+        Terrain terrain = new Terrain(-1, -1, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
+        Terrain terrain2 = new Terrain(-1, 0, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
+
+        Camera camera = new Camera(displayManager.getWindowHandle());
         MasterRenderer renderer = new MasterRenderer(displayManager);
 
         while (!displayManager.isCloseRequested()) {
             camera.move();
-            for (Entity cube : allCubes) {
-                renderer.processEntity(cube);
+
+            renderer.processTerrain(terrain);
+            renderer.processTerrain(terrain2);
+
+            for(Entity entity:entities){
+                renderer.processEntity(entity);
             }
             renderer.render(light, camera);
             displayManager.updateDisplay();
