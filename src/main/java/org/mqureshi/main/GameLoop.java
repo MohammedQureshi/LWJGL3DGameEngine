@@ -33,8 +33,8 @@ public class GameLoop {
 
         Light light = new Light(new Vector3f(3000, 2000, 20), new Vector3f(1, 1, 1));
 
-        Terrain terrain = new Terrain(-1, -1, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
-        Terrain terrain2 = new Terrain(-1, 0, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
+        Terrain terrain = new Terrain(0, -1, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
+        Terrain terrain2 = new Terrain(-1, -1, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
 
         Camera camera = new Camera(displayManager.getWindowHandle());
         MasterRenderer renderer = new MasterRenderer(displayManager);
