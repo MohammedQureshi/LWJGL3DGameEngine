@@ -33,11 +33,19 @@ public class MasterRenderer {
     private final List<Terrain> terrains = new ArrayList<>();
 
     public MasterRenderer(DisplayManager displayManager) {
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCullFace(GL11.GL_BACK);
+        enableCulling();
         createProjectionMatrix(displayManager);
         entityRenderer = new EntityRenderer(shader, projectionMatrix);
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
+    }
+
+    public static void enableCulling() {
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glCullFace(GL11.GL_BACK);
+    }
+
+    public static void disableCulling() {
+        GL11.glDisable(GL11.GL_CULL_FACE);
     }
 
     public void render(Light sun, Camera camera) {
@@ -62,7 +70,7 @@ public class MasterRenderer {
 
     public void processEntity(Entity entity) {
         TexturedModel entityModel = entity.getModel();
-        entities.computeIfAbsent(entityModel, _ -> new ArrayList<>()).add(entity);
+        entities.computeIfAbsent(entityModel, k -> new ArrayList<>()).add(entity);
     }
 
     public void cleanUp() {

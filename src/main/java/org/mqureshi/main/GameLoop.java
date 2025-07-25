@@ -25,10 +25,17 @@ public class GameLoop {
         ModelTexture texture = new ModelTexture(loader.loadTexture("assets/tree/tree.png"));
         TexturedModel staticModel = new TexturedModel(model, texture);
 
+        RawModel grassModel = ObjLoader.loadObjModel("assets/grass/grassModel.obj", loader);
+        ModelTexture grassTexture = new ModelTexture(loader.loadTexture("assets/grass/grassTexture.png"));
+        TexturedModel grassStaticModel = new TexturedModel(grassModel, grassTexture);
+        grassStaticModel.getModelTexture().setHasTransparency(true);
+        grassStaticModel.getModelTexture().setUseFakeLighting(true);
+
         List<Entity> entities = new ArrayList<>();
         Random random = new Random();
         for (int i = 0; i < 500; i++) {
             entities.add(new Entity(staticModel, new Vector3f(random.nextFloat() * 800 - 400, 0, random.nextFloat() * -600), 0, 0, 0, 3));
+            entities.add(new Entity(grassStaticModel, new Vector3f(random.nextFloat() * 800 - 400, 0, random.nextFloat() * -600), 0, 0, 0, 3));
         }
 
         Light light = new Light(new Vector3f(3000, 2000, 20), new Vector3f(1, 1, 1));
