@@ -1,18 +1,15 @@
 package org.mqureshi.main;
 
-import org.joml.Random;
-import org.joml.Vector3f;
 import org.mqureshi.entities.Camera;
 import org.mqureshi.entities.Entity;
-import org.mqureshi.entities.Light;
-import org.mqureshi.models.TexturedModel;
 import org.mqureshi.renderEngine.*;
-import org.mqureshi.models.RawModel;
+import org.mqureshi.scene.DesertScene;
+import org.mqureshi.scene.ForestScene;
+import org.mqureshi.scene.Scene;
+import org.mqureshi.scene.SceneManager;
 import org.mqureshi.terrains.Terrain;
-import org.mqureshi.textures.ModelTexture;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class GameLoop {
 
@@ -21,42 +18,52 @@ public class GameLoop {
         displayManager.createDisplay();
         Loader loader = new Loader();
 
-        RawModel model = ObjLoader.loadObjModel("assets/tree/tree.obj", loader);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("assets/tree/tree.png"));
-        TexturedModel staticModel = new TexturedModel(model, texture);
-
-        RawModel grassModel = ObjLoader.loadObjModel("assets/grass/grassModel.obj", loader);
-        ModelTexture grassTexture = new ModelTexture(loader.loadTexture("assets/grass/grassTexture.png"));
-        TexturedModel grassStaticModel = new TexturedModel(grassModel, grassTexture);
-        grassStaticModel.getModelTexture().setHasTransparency(true);
-        grassStaticModel.getModelTexture().setUseFakeLighting(true);
-
-        List<Entity> entities = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < 500; i++) {
-            entities.add(new Entity(staticModel, new Vector3f(random.nextFloat() * 800 - 400, 0, random.nextFloat() * -600), 0, 0, 0, 3));
-            entities.add(new Entity(grassStaticModel, new Vector3f(random.nextFloat() * 800 - 400, 0, random.nextFloat() * -600), 0, 0, 0, 3));
-        }
-
-        Light light = new Light(new Vector3f(3000, 2000, 20), new Vector3f(1, 1, 1));
-
-        Terrain terrain = new Terrain(0, -1, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
-        Terrain terrain2 = new Terrain(-1, -1, loader, new ModelTexture(loader.loadTexture("textures/grass.png")));
+        Scene forestScene = new ForestScene();
+        Scene desertScene = new DesertScene();
+        SceneManager sceneManager = new SceneManager();
+        sceneManager.setScene(forestScene, loader);
 
         Camera camera = new Camera(displayManager.getWindowHandle());
         MasterRenderer renderer = new MasterRenderer(displayManager);
 
+        //TODO: Remove these when FPS counter not needed
+        long lastTime = System.currentTimeMillis();
+        int frames = 0;
+
         while (!displayManager.isCloseRequested()) {
+
+            if (glfwGetKey(displayManager.getWindowHandle(), GLFW_KEY_1) == GLFW_PRESS) {
+                sceneManager.setScene(desertScene, loader);
+            }
+//              DEBUGGING TO SWITCH BETWEEN SCENES
+            if (glfwGetKey(displayManager.getWindowHandle(), GLFW_KEY_2) == GLFW_PRESS) {
+                sceneManager.setScene(forestScene, loader);
+            }
+
             camera.move();
 
-            renderer.processTerrain(terrain);
-            renderer.processTerrain(terrain2);
+            Scene currentScene = sceneManager.getCurrentScene();
 
-            for (Entity entity : entities) {
+            for (Terrain terrain : currentScene.getTerrains()) {
+                renderer.processTerrain(terrain);
+            }
+
+            for (Entity entity : currentScene.getEntities()) {
                 renderer.processEntity(entity);
             }
-            renderer.render(light, camera);
+
+            renderer.render(currentScene.getLight(), camera);
+
             displayManager.updateDisplay();
+
+            //TODO: FPS Counter needs to be removed
+            frames++;
+            if (System.currentTimeMillis() - lastTime >= 1000) {
+                glfwSetWindowTitle(displayManager.getWindowHandle(), "Mohammed's Awesome Game | FPS: " + frames);
+                frames = 0;
+                lastTime += 1000;
+            }
+
         }
         renderer.cleanUp();
         loader.cleanUp();

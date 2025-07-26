@@ -5,7 +5,7 @@ import org.mqureshi.entities.Camera;
 import org.mqureshi.entities.Light;
 import org.mqureshi.toolbox.Maths;
 
-public class TerrainShader extends  ShaderProgram {
+public class TerrainShader extends ShaderProgram {
 
     private static final String vertexFile = "/shaders/terrainVertexShader.glsl";
     private static final String fragmentFile = "/shaders/terrainFragmentShader.glsl";

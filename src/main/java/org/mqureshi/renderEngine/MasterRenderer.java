@@ -50,7 +50,9 @@ public class MasterRenderer {
 
     public void render(Light sun, Camera camera) {
         prepare();
+        float time = (float) GLFW.glfwGetTime();
         shader.start();
+        shader.loadTime(time);
         shader.loadLight(sun);
         shader.loadViewMatrix(camera);
         entityRenderer.render(entities);

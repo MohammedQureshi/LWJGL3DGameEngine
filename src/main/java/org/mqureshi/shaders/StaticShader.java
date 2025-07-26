@@ -18,6 +18,12 @@ public class StaticShader extends ShaderProgram{
     private int location_shineDamper;
     private int location_reflectivity;
     private int location_useFakeLighting;
+    private int location_time;
+    private int location_speed;
+    private int location_frequency;
+    private int location_swayStrength;
+    private int location_swayOffset;
+    private int location_useFakeWind;
 
     public StaticShader() {
         super(vertexFile, fragmentFile);
@@ -40,6 +46,30 @@ public class StaticShader extends ShaderProgram{
         location_shineDamper = super.getUniformLocation("shineDamper");
         location_reflectivity = super.getUniformLocation("reflectivity");
         location_useFakeLighting = super.getUniformLocation("useFakeLighting");
+        location_useFakeWind = super.getUniformLocation("useFakeWind");
+        location_time = super.getUniformLocation("time");
+        location_speed = super.getUniformLocation("speed");
+        location_frequency = super.getUniformLocation("frequency");
+        location_swayStrength = super.getUniformLocation("swayStrength");
+        location_swayOffset = super.getUniformLocation("swayOffset");
+    }
+
+    public void loadTime(float time) {
+        super.loadFloat(location_time, time);
+    }
+
+    public void loadSwayParameters(float speed, float frequency, float swayStrength) {
+        super.loadFloat(location_speed, speed);
+        super.loadFloat(location_frequency, frequency);
+        super.loadFloat(location_swayStrength, swayStrength);
+    }
+
+    public void loadSwayOffset(float offset) {
+        super.loadFloat(location_swayOffset, offset);
+    }
+
+    public void loadFakeSway(boolean useSway){
+        super.loadBoolean(location_useFakeWind, useSway);
     }
 
     public void loadFakeLightingVariable(boolean useFakeLighting) {

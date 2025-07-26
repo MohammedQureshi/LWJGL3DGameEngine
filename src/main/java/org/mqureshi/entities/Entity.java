@@ -9,6 +9,7 @@ public class Entity {
     private Vector3f position;
     private float rotX, rotY, rotZ;
     private float scale;
+    private final float swayOffset = (float) Math.random() * 100.0f;
 
     public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
         this.model = model;
@@ -17,6 +18,10 @@ public class Entity {
         this.rotY = rotY;
         this.rotZ = rotZ;
         this.scale = scale;
+    }
+
+    public float getSwayOffset() {
+        return swayOffset;
     }
 
     public void increasePosition(float dx, float dy, float dz) {
